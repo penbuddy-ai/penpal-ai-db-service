@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      target: development
+    container_name: penpal-ai-db-service
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3001:3001"
+    command: npm run start:dev
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    networks:
+      - penpal-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: penpal-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - penpal-network
+    environment:
+      - MONGO_INITDB_DATABASE=penpal-ai
+
+networks:
+  penpal-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
