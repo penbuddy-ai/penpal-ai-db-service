@@ -1,39 +1,78 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, HttpException, UseInterceptors } from "@nestjs/common";
+import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from "@nestjs/swagger";
 
 import { CreateLanguageDto, UpdateLanguageDto } from "./dto/language.dto";
 import { LanguagesService } from "./languages.service";
 import { Language } from "./schemas/language.schema";
 
+@ApiTags('languages')
 @Controller("languages")
 export class LanguagesController {
   constructor(private readonly languagesService: LanguagesService) {}
 
+  @Post()
+  @ApiOperation({ summary: 'Create a new language' })
+  @ApiResponse({ status: 201, description: 'The language has been successfully created.', type: Language })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiBody({ type: CreateLanguageDto })
+  async create(@Body() createLanguageDto: CreateLanguageDto): Promise<Language> {
+    return this.languagesService.create(createLanguageDto);
+  }
+
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all_languages')
+  @CacheTTL(3600)
+  @ApiOperation({ summary: 'Get all languages' })
+  @ApiResponse({ status: 200, description: 'Return all languages.', type: [Language] })
   async findAll(): Promise<Language[]> {
     return this.languagesService.findAll();
   }
 
   @Get(":code")
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('language_by_code')
+  @CacheTTL(3600)
+  @ApiOperation({ summary: 'Get a language by code' })
+  @ApiParam({ name: 'code', type: 'string', description: 'Language code' })
+  @ApiResponse({ status: 200, description: 'Return the language.', type: Language })
+  @ApiResponse({ status: 404, description: 'Language not found.' })
   async findOne(@Param("code") code: string): Promise<Language> {
-    return this.languagesService.findOne(code);
-  }
-
-  @Post()
-  async create(@Body() createLanguageDto: CreateLanguageDto): Promise<Language> {
-    return this.languagesService.create(createLanguageDto);
+    const language = await this.languagesService.findOne(code);
+    if (!language) {
+      throw new HttpException('Language not found', HttpStatus.NOT_FOUND);
+    }
+    return language;
   }
 
   @Put(":code")
+  @ApiOperation({ summary: 'Update a language' })
+  @ApiParam({ name: 'code', type: 'string', description: 'Language code' })
+  @ApiBody({ type: UpdateLanguageDto })
+  @ApiResponse({ status: 200, description: 'The language has been successfully updated.', type: Language })
+  @ApiResponse({ status: 404, description: 'Language not found.' })
   async update(
     @Param("code") code: string,
     @Body() updateLanguageDto: UpdateLanguageDto,
   ): Promise<Language> {
-    return this.languagesService.update(code, updateLanguageDto);
+    const language = await this.languagesService.update(code, updateLanguageDto);
+    if (!language) {
+      throw new HttpException('Language not found', HttpStatus.NOT_FOUND);
+    }
+    return language;
   }
 
   @Delete(":code")
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a language' })
+  @ApiParam({ name: 'code', type: 'string', description: 'Language code' })
+  @ApiResponse({ status: 204, description: 'The language has been successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Language not found.' })
   async remove(@Param("code") code: string): Promise<void> {
-    return this.languagesService.remove(code);
+    const language = await this.languagesService.remove(code);
+    if (!language) {
+      throw new HttpException('Language not found', HttpStatus.NOT_FOUND);
+    }
   }
 }

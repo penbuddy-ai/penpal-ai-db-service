@@ -18,6 +18,11 @@ export default antfu({
     "antfu/no-top-level-await": ["off"],
     "node/prefer-global/process": ["off"],
     "node/no-process-env": ["off"],
+    "no-unused-vars": ["error", {
+      "vars": "all",
+      "args": "after-used",
+      "ignoreRestSiblings": true
+    }],
     "perfectionist/sort-imports": ["error", {
       tsconfigRootDir: ".",
     }],
