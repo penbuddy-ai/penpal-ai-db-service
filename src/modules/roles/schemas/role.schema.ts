@@ -11,11 +11,14 @@ export class Role {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ type: [String], required: true })
-  permissions: string[];
+  @Prop({ type: Object, required: true })
+  permissions: Record<string, string[]>;
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({ default: false })
+  isSystem: boolean;
 
   @Prop({ type: Object })
   metadata: {
@@ -30,4 +33,3 @@ export const RoleSchema = SchemaFactory.createForClass(Role);
 // Indexes
 RoleSchema.index({ name: 1 }, { unique: true });
 RoleSchema.index({ isActive: 1 });
-RoleSchema.index({ permissions: 1 });
