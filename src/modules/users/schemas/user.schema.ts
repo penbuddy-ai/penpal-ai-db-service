@@ -2,9 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from "mongoose";
 
 import { Conversation } from "../../conversations/schemas/conversation.schema";
-import { Role } from "../../roles/schemas/role.schema";
 import { Language } from "../../languages/schemas/language.schema";
-import { UserRole } from "./user-role.schema";
 
 export type UserDocument = User & Document;
 
@@ -82,4 +80,4 @@ export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ status: 1 });
 UserSchema.index({ lastActive: 1 });
-UserSchema.index({ "learningLanguages": 1 });
+UserSchema.index({ learningLanguages: 1 });

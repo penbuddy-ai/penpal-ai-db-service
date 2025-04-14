@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDate } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateLanguageDto {
   @IsString()
@@ -20,4 +20,4 @@ export class CreateLanguageDto {
   @IsDate()
   @IsOptional()
   updatedAt?: Date;
-} 
+}

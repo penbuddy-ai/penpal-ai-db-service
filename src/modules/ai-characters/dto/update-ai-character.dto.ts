@@ -1,6 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { IsOptional, IsString, IsArray, IsBoolean, IsObject, IsNumber } from 'class-validator';
-import { CreateAICharacterDto } from './create-ai-character.dto';
+import { PartialType } from "@nestjs/swagger";
+import { IsArray, IsBoolean, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
+
+import { CreateAICharacterDto } from "./create-ai-character.dto";
 
 export class UpdateAICharacterDto extends PartialType(CreateAICharacterDto) {
   @IsOptional()
@@ -48,4 +49,4 @@ export class UpdateAICharacterDto extends PartialType(CreateAICharacterDto) {
   @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
-} 
+}

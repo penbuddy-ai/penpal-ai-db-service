@@ -21,15 +21,15 @@ export default registerAs("security", () => ({
   },
   password: {
     saltRounds: process.env.PASSWORD_SALT_ROUNDS
-      ? parseInt(process.env.PASSWORD_SALT_ROUNDS)
+      ? Number.parseInt(process.env.PASSWORD_SALT_ROUNDS)
       : 10,
   },
   login: {
     maxAttempts: process.env.MAX_LOGIN_ATTEMPTS
-      ? parseInt(process.env.MAX_LOGIN_ATTEMPTS)
+      ? Number.parseInt(process.env.MAX_LOGIN_ATTEMPTS)
       : 5,
     lockoutMinutes: process.env.LOGIN_LOCKOUT_MINUTES
-      ? parseInt(process.env.LOGIN_LOCKOUT_MINUTES)
+      ? Number.parseInt(process.env.LOGIN_LOCKOUT_MINUTES)
       : 15,
   },
-})); 
+}));

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { AICharacterService } from './ai-characters.service';
+
+import { AICharacterService } from "./ai-characters.service";
 import { AICharacter, AICharacterSchema } from "./schemas/ai-character.schema";
 
 @Module({

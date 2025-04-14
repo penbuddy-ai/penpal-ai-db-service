@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AppService {
@@ -11,11 +11,11 @@ export class AppService {
 
   checkHealth() {
     return {
-      status: 'ok',
+      status: "ok",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      service: 'penpal-ai-db-service',
-      environment: this.configService.get<string>('NODE_ENV') || 'development',
+      service: "penpal-ai-db-service",
+      environment: this.configService.get<string>("NODE_ENV") || "development",
     };
   }
 }

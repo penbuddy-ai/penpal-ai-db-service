@@ -1,20 +1,19 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod, Logger, OnModuleInit } from "@nestjs/common";
+import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { MongooseModule, MongooseModuleOptions } from "@nestjs/mongoose";
+import { InjectConnection, MongooseModule, MongooseModuleOptions } from "@nestjs/mongoose";
 import { Connection } from "mongoose";
-import { InjectConnection } from "@nestjs/mongoose";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import cacheConfig from "./config/cache.config";
+import { LoggerMiddleware } from "./middleware/logger.middleware";
 import { AICharactersModule } from "./modules/ai-characters/ai-characters.module";
+import { CacheModule } from "./modules/cache/cache.module";
 import { ConversationsModule } from "./modules/conversations/conversations.module";
 import { LanguagesModule } from "./modules/languages/languages.module";
 import { MessagesModule } from "./modules/messages/messages.module";
 import { RolesModule } from "./modules/roles/roles.module";
 import { UsersModule } from "./modules/users/users.module";
-import { CacheModule } from "./modules/cache/cache.module";
-import { LoggerMiddleware } from "./middleware/logger.middleware";
-import cacheConfig from "./config/cache.config";
 
 @Module({
   imports: [
@@ -25,12 +24,12 @@ import cacheConfig from "./config/cache.config";
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const logger = new Logger('MongoDB');
+        const logger = new Logger("MongoDB");
         const mongoUri = configService.get<string>("MONGODB_URI") || "mongodb://localhost:27017/penpal-ai";
-        const sanitizedMongoURI = mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
-        
+        const sanitizedMongoURI = mongoUri.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@");
+
         logger.log(`Configuring MongoDB connection: ${sanitizedMongoURI}`);
-        
+
         const options: MongooseModuleOptions = {
           uri: mongoUri,
           user: configService.get<string>("MONGODB_USER"),
@@ -49,7 +48,7 @@ import cacheConfig from "./config/cache.config";
           authSource: "admin",
           ssl: configService.get<string>("NODE_ENV") === "production",
         };
-        
+
         return options;
       },
       inject: [ConfigService],
@@ -66,14 +65,14 @@ import cacheConfig from "./config/cache.config";
   providers: [AppService],
 })
 export class AppModule implements NestModule, OnModuleInit {
-  private readonly logger = new Logger('MongoDB');
-  
+  private readonly logger = new Logger("MongoDB");
+
   constructor(@InjectConnection() private readonly connection: Connection) {}
-  
+
   async onModuleInit() {
     if (this.connection.readyState === 1) {
-      this.logger.log('✅ Successfully connected to MongoDB');
-      
+      this.logger.log("✅ Successfully connected to MongoDB");
+
       try {
         // Get database stats to verify connection
         const db = this.connection.db;
@@ -84,17 +83,19 @@ export class AppModule implements NestModule, OnModuleInit {
             this.logger.log(`Connected to database: ${dbName} (Collections: ${dbStats.collections}, Documents: ${dbStats.objects})`);
           }
         }
-      } catch (error) {
+      }
+      catch (error) {
         this.logger.error(`Failed to get database stats: ${error.message}`);
       }
-    } else {
+    }
+    else {
       this.logger.error(`❌ Failed to connect to MongoDB. Connection state: ${this.connection.readyState}`);
     }
   }
-  
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)
-      .forRoutes({ path: '*path', method: RequestMethod.ALL });
+      .forRoutes({ path: "*path", method: RequestMethod.ALL });
   }
 }

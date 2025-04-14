@@ -1,6 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { IsOptional, IsString, IsArray, IsBoolean } from 'class-validator';
-import { CreateRoleDto } from './create-role.dto';
+import { PartialType } from "@nestjs/swagger";
+import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
+
+import { CreateRoleDto } from "./create-role.dto";
 
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {
   @IsOptional()
@@ -19,4 +20,4 @@ export class UpdateRoleDto extends PartialType(CreateRoleDto) {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
-} 
+}

@@ -1,29 +1,30 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ValidationPipe, Logger } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import helmet from "helmet";
 import * as compression from "compression";
+import helmet from "helmet";
+
+import { AppModule } from "./app.module";
 import { LoggingInterceptor } from "./interceptors/logging.interceptor";
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
-  logger.log('Starting Penpal AI Database Service...');
+  const logger = new Logger("Bootstrap");
+  logger.log("Starting Penpal AI Database Service...");
 
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'], // Active tous les niveaux de log en développement
+    logger: ["error", "warn", "log", "debug", "verbose"], // Active tous les niveaux de log en développement
   });
   const configService = app.get(ConfigService);
 
   // Configuration du niveau de log basé sur l'environnement
-  const logLevel = configService.get<string>('LOG_LEVEL') || 'debug';
+  const logLevel = configService.get<string>("LOG_LEVEL") || "debug";
   logger.log(`Application running with LOG_LEVEL: ${logLevel}`);
 
   // Interceptor global pour le logging
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     app.useGlobalInterceptors(new LoggingInterceptor());
-    logger.log('Logging interceptor enabled for detailed request/response logging');
+    logger.log("Logging interceptor enabled for detailed request/response logging");
   }
 
   // Security
@@ -41,7 +42,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
       disableErrorMessages: configService.get<boolean>("api.validation.disableErrorMessages") || false,
-    })
+    }),
   );
 
   // Documentation
@@ -70,18 +71,18 @@ async function bootstrap() {
     .setContact(
       "Penpal AI Team",
       "https://penpal.ai",
-      "support@penpal.ai"
+      "support@penpal.ai",
     )
     .setLicense(
       "MIT",
-      "https://opensource.org/licenses/MIT"
+      "https://opensource.org/licenses/MIT",
     )
     .addBearerAuth()
-    .addTag('languages', 'Gestion des langues disponibles')
-    .addTag('users', 'Gestion des utilisateurs')
-    .addTag('roles', 'Gestion des rôles et permissions')
-    .addTag('ai-characters', 'Gestion des personnages IA')
-    .addTag('health', 'Monitoring et statut de l\'API')
+    .addTag("languages", "Gestion des langues disponibles")
+    .addTag("users", "Gestion des utilisateurs")
+    .addTag("roles", "Gestion des rôles et permissions")
+    .addTag("ai-characters", "Gestion des personnages IA")
+    .addTag("health", "Monitoring et statut de l'API")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -94,7 +95,7 @@ async function bootstrap() {
 
   // Log connection details
   const mongoURI = configService.get<string>("MONGODB_URI") || "mongodb://localhost:27017/penpal-ai";
-  const sanitizedMongoURI = mongoURI.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
+  const sanitizedMongoURI = mongoURI.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@");
   logger.log(`MongoDB connection: ${sanitizedMongoURI}`);
 
   const redisHost = configService.get<string>("REDIS_HOST") || "localhost";
@@ -104,7 +105,7 @@ async function bootstrap() {
   // Start server
   await app.listen(configService.get<number>("PORT") || 3001);
   logger.log(`Application is running on: ${await app.getUrl()}`);
-  logger.log('API is ready to accept connections');
+  logger.log("API is ready to accept connections");
 }
 
 bootstrap();

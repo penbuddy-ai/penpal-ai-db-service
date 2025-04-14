@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDate, IsArray } from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateAICharacterDto {
   @IsString()
@@ -33,4 +33,4 @@ export class CreateAICharacterDto {
   @IsDate()
   @IsOptional()
   updatedAt?: Date;
-} 
+}

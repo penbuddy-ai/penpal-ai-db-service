@@ -15,6 +15,7 @@ Ce dossier contient la configuration Docker Compose pour le développement local
 ## Configuration
 
 1. Copiez le fichier `.env.example` vers `.env` :
+
 ```bash
 cp .env.example .env
 ```
@@ -49,6 +50,7 @@ docker-compose logs -f
 ## Configuration MongoDB
 
 La base de données MongoDB est configurée avec :
+
 - Authentification activée
 - Base de données par défaut : `penpal-ai`
 - Utilisateur root : défini dans le fichier `.env`
@@ -57,6 +59,7 @@ La base de données MongoDB est configurée avec :
 ## Volumes
 
 Les données MongoDB sont persistantes et stockées dans des volumes Docker :
+
 - `mongodb_data` : données de la base de données
 - `mongodb_config` : fichiers de configuration MongoDB
 
@@ -67,12 +70,14 @@ Les services communiquent via le réseau `penpal-network` avec la plage IP `172.
 ## Health Checks
 
 Les deux services incluent des health checks :
+
 - **db-service** : vérifie l'endpoint `/api/health`
 - **mongodb** : vérifie la connexion à la base de données
 
 ## Développement
 
 Pour le développement, le code source est monté en volume dans le conteneur `db-service`, ce qui permet :
+
 - Modifications en temps réel
 - Débogage facile
 - Pas besoin de reconstruire l'image à chaque changement
@@ -83,4 +88,4 @@ Pour ajouter d'autres services à cette configuration :
 
 1. Ajoutez le service dans `docker-compose.yml`
 2. Configurez les dépendances avec `depends_on`
-3. Ajoutez les variables d'environnement nécessaires dans `.env` 
+3. Ajoutez les variables d'environnement nécessaires dans `.env`

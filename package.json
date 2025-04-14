@@ -95,6 +95,6 @@
     "testEnvironment": "node"
   },
   "lint-staged": {
-    "*": "pnpm lint"
+    "*": "npm run lint"
   }
 }

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsDate } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateRoleDto {
   @IsString()
@@ -16,4 +16,4 @@ export class CreateRoleDto {
   @IsDate()
   @IsOptional()
   updatedAt?: Date;
-} 
+}

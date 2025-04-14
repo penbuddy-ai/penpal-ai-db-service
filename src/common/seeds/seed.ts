@@ -1,19 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { Types } from "mongoose";
+
 import { AppModule } from "../../app.module";
+import { AICharacterService } from "../../modules/ai-characters/ai-characters.service";
+import { LanguagesService } from "../../modules/languages/languages.service";
+import { Language } from "../../modules/languages/schemas/language.schema";
+import { RoleService } from "../../modules/roles/roles.service";
+import { Role } from "../../modules/roles/schemas/role.schema";
+import { CreateUserDto } from "../../modules/users/dto/create-user.dto";
+import { User } from "../../modules/users/schemas/user.schema";
+import { UserService } from "../../modules/users/users.service";
 import { aiCharactersSeed } from "./ai-characters.seed";
 import { languagesSeed } from "./languages.seed";
 import { rolesSeed } from "./roles.seed";
-import { usersSeed } from "./users.seed";
-import { RoleService } from '../../modules/roles/roles.service';
-import { LanguagesService } from '../../modules/languages/languages.service';
-import { AICharacterService } from '../../modules/ai-characters/ai-characters.service';
-import { UserService } from '../../modules/users/users.service';
-import { CreateUserDto } from '../../modules/users/dto/create-user.dto';
-import { Language } from '../../modules/languages/schemas/language.schema';
-import { Role } from '../../modules/roles/schemas/role.schema';
-import { User } from '../../modules/users/schemas/user.schema';
-import { Types } from 'mongoose';
 
 /**
  * Script to seed the database with initial data
@@ -35,7 +35,8 @@ async function bootstrap() {
         await languageService.create(language);
       }
       logger.log(`✅ ${languagesSeed.length} languages seeded`);
-    } else {
+    }
+    else {
       logger.log("Languages collection already populated, skipping seed");
     }
 
@@ -49,7 +50,8 @@ async function bootstrap() {
         await roleService.create(role);
       }
       logger.log(`✅ ${rolesSeed.length} roles seeded`);
-    } else {
+    }
+    else {
       logger.log("Roles collection already populated, skipping seed");
     }
 
@@ -63,7 +65,8 @@ async function bootstrap() {
         await aiCharacterService.create(character);
       }
       logger.log(`✅ ${aiCharactersSeed.length} AI characters seeded`);
-    } else {
+    }
+    else {
       logger.log("AI Characters collection already populated, skipping seed");
     }
 
@@ -95,12 +98,12 @@ async function bootstrap() {
         preferences: {
           notifications: true,
           darkMode: true,
-          language: "en"
+          language: "en",
         },
         statistics: {
           averageResponseTime: 0,
           vocabularySize: 0,
-          grammarAccuracy: 0
+          grammarAccuracy: 0,
         },
         lastLogin: new Date(),
         createdAt: new Date(),
@@ -110,15 +113,18 @@ async function bootstrap() {
       const createdUser = await userService.create(adminUser) as User & { _id: Types.ObjectId };
       await userService.assignRole(createdUser._id.toString(), adminRole._id.toString());
       logger.log("✅ Admin user seeded");
-    } else {
+    }
+    else {
       logger.log("Admin user already exists, skipping seed");
     }
 
     logger.log("✅ Database seeding completed");
-  } catch (error) {
+  }
+  catch (error) {
     logger.error("❌ Error seeding database");
     logger.error(error);
-  } finally {
+  }
+  finally {
     await app.close();
   }
 }

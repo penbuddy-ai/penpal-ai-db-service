@@ -1,4 +1,4 @@
-import { CreateAICharacterDto } from '../../modules/ai-characters/dto/create-ai-character.dto';
+import { CreateAICharacterDto } from "../../modules/ai-characters/dto/create-ai-character.dto";
 
 export const aiCharactersSeed: CreateAICharacterDto[] = [
   {

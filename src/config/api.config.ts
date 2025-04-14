@@ -31,4 +31,4 @@ export default registerAs("api", () => ({
     timestamp: true,
     prettyPrint: process.env.NODE_ENV !== "production",
   },
-})); 
+}));

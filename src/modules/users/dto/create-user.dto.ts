@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, IsOptional, IsBoolean, IsDate, IsArray } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
 
 export class CreateUserDto {
   @IsEmail()
@@ -72,4 +72,4 @@ export class CreateUserDto {
   @IsDate()
   @IsOptional()
   updatedAt?: Date;
-} 
+}

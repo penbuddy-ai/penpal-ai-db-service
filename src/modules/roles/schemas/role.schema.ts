@@ -30,4 +30,4 @@ export const RoleSchema = SchemaFactory.createForClass(Role);
 // Indexes
 RoleSchema.index({ name: 1 }, { unique: true });
 RoleSchema.index({ isActive: 1 });
-RoleSchema.index({ "permissions": 1 });
+RoleSchema.index({ permissions: 1 });

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
-import { UserRole } from './schemas/user-role.schema';
-import { CreateUserDto } from './dto/create-user.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UserRole } from "./schemas/user-role.schema";
+import { User } from "./schemas/user.schema";
 
 @Injectable()
 export class UserService {
@@ -17,8 +18,18 @@ export class UserService {
     return createdUser.save();
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+  async findAll(limit?: number, offset?: number): Promise<User[]> {
+    let query = this.userModel.find();
+
+    if (offset) {
+      query = query.skip(offset);
+    }
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    return query.exec();
   }
 
   async findOne(id: string): Promise<User | null> {
@@ -47,10 +58,10 @@ export class UserService {
   }
 
   async getUserRoles(userId: string): Promise<UserRole[]> {
-    return this.userRoleModel.find({ userId }).populate('roleId').exec();
+    return this.userRoleModel.find({ userId }).populate("roleId").exec();
   }
 
   async removeRole(userId: string, roleId: string): Promise<void> {
     await this.userRoleModel.deleteOne({ userId, roleId }).exec();
   }
-} 
+}

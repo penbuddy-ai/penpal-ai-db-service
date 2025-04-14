@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { AICharacter } from './schemas/ai-character.schema';
-import { CreateAICharacterDto } from './dto/create-ai-character.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+
+import { CreateAICharacterDto } from "./dto/create-ai-character.dto";
+import { AICharacter } from "./schemas/ai-character.schema";
 
 @Injectable()
 export class AICharacterService {
@@ -34,4 +35,4 @@ export class AICharacterService {
   async remove(id: string): Promise<AICharacter | null> {
     return this.aiCharacterModel.findByIdAndDelete(id).exec();
   }
-} 
+}

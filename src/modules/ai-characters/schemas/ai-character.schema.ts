@@ -34,4 +34,4 @@ export const AICharacterSchema = SchemaFactory.createForClass(AICharacter);
 
 // Indexes
 AICharacterSchema.index({ name: 1 });
-AICharacterSchema.index({ "languages": 1 });
+AICharacterSchema.index({ languages: 1 });

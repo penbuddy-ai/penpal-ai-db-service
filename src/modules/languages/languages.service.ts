@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Language } from './schemas/language.schema';
-import { CreateLanguageDto } from './dto/create-language.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+
+import { CreateLanguageDto } from "./dto/create-language.dto";
+import { Language } from "./schemas/language.schema";
 
 @Injectable()
 export class LanguagesService {
