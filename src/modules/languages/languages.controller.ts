@@ -2,7 +2,8 @@ import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Put, UseInterceptors } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import { CreateLanguageDto, UpdateLanguageDto } from "./dto/language.dto";
+import { CreateLanguageDto } from "./dto/create-language.dto";
+import { UpdateLanguageDto } from "./dto/update-language.dto";
 import { LanguagesService } from "./languages.service";
 import { Language } from "./schemas/language.schema";
 

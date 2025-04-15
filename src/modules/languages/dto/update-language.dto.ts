@@ -1,22 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsNumber, IsObject, IsOptional, IsString, Max, Min } from "class-validator";
 
-export class CreateLanguageDto {
-  @ApiProperty({
-    example: "fr",
-    description: "ISO language code",
-  })
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
+export class UpdateLanguageDto {
   @ApiProperty({
     example: "French",
     description: "English name of the language",
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @ApiProperty({
     example: "Français",
@@ -28,9 +21,30 @@ export class CreateLanguageDto {
   nativeName?: string;
 
   @ApiProperty({
+    example: "🇫🇷",
+    description: "Flag emoji for the language",
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  flag?: string;
+
+  @ApiProperty({
+    example: 3,
+    description: "Difficulty level of the language (1-5)",
+    minimum: 1,
+    maximum: 5,
+    required: false,
+  })
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  @IsOptional()
+  difficulty?: number;
+
+  @ApiProperty({
     example: true,
     description: "Whether the language is available for use in the application",
-    default: false,
     required: false,
   })
   @IsBoolean()
@@ -66,39 +80,4 @@ export class CreateLanguageDto {
   @IsString({ each: true })
   @IsOptional()
   availableLevels?: string[];
-
-  @ApiProperty({
-    example: {
-      dictionaryUrl: "https://dictionary.example.com/french",
-      grammarGuideUrl: "https://grammar.example.com/french",
-      pronunciationGuideUrl: "https://pronunciation.example.com/french",
-    },
-    description: "External resources for learning the language",
-    required: false,
-  })
-  @IsObject()
-  @IsOptional()
-  resources?: {
-    dictionaryUrl: string;
-    grammarGuideUrl: string;
-    pronunciationGuideUrl: string;
-  };
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the language was created",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  createdAt?: Date;
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the language was last updated",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  updatedAt?: Date;
 }

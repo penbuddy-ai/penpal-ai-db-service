@@ -1,7 +1,7 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from "@nestjs/swagger";
 import * as compression from "compression";
 import helmet from "helmet";
 
@@ -85,8 +85,27 @@ async function bootstrap() {
     .addTag("health", "Monitoring et statut de l'API")
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("docs", app, document);
+  const document = SwaggerModule.createDocument(app, config, {
+    deepScanRoutes: true,
+    extraModels: [],
+  });
+
+  const customOptions: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: "none",
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      defaultModelsExpandDepth: 3,
+      defaultModelExpandDepth: 3,
+      displayRequestDuration: true,
+    },
+    customSiteTitle: "Penpal AI API Documentation",
+    customCss: ".swagger-ui .topbar { display: none }",
+  };
+
+  SwaggerModule.setup("docs", app, document, customOptions);
 
   // Global prefix
   const prefix = configService.get<string>("API_PREFIX") || "/api";

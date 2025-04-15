@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
 import { CreateLanguageDto } from "./dto/create-language.dto";
+import { UpdateLanguageDto } from "./dto/update-language.dto";
 import { Language } from "./schemas/language.schema";
 
 @Injectable()
@@ -28,7 +29,7 @@ export class LanguagesService {
     return this.languageModel.findOne({ code }).exec();
   }
 
-  async update(id: string, updateLanguageDto: Partial<CreateLanguageDto>): Promise<Language | null> {
+  async update(id: string, updateLanguageDto: UpdateLanguageDto): Promise<Language | null> {
     return this.languageModel.findByIdAndUpdate(id, updateLanguageDto, { new: true }).exec();
   }
 

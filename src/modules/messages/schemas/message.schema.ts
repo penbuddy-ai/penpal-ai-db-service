@@ -7,7 +7,7 @@ import { User } from "../../users/schemas/user.schema";
 export type MessageDocument = Message & Document;
 
 @Schema({ timestamps: true })
-export class Message {
+export class Message extends Document {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Conversation", required: true })
   conversationId: Conversation;
 
