@@ -45,6 +45,12 @@ async function bootstrap() {
     }),
   );
 
+  // Global prefix
+  const prefix = configService.get<string>("API_PREFIX") || "/api";
+  const version = configService.get<string>("API_VERSION") || "v1";
+  const globalPrefix = `${prefix}/${version}`;
+  app.setGlobalPrefix(globalPrefix);
+
   // Documentation
   const config = new DocumentBuilder()
     .setTitle("Penpal AI API")
@@ -83,6 +89,7 @@ async function bootstrap() {
     .addTag("roles", "Gestion des rôles et permissions")
     .addTag("ai-characters", "Gestion des personnages IA")
     .addTag("health", "Monitoring et statut de l'API")
+    .addServer(`http://localhost:${configService.get<number>("PORT") || 3001}`)
     .build();
 
   const document = SwaggerModule.createDocument(app, config, {
@@ -105,12 +112,7 @@ async function bootstrap() {
     customCss: ".swagger-ui .topbar { display: none }",
   };
 
-  SwaggerModule.setup("docs", app, document, customOptions);
-
-  // Global prefix
-  const prefix = configService.get<string>("API_PREFIX") || "/api";
-  const version = configService.get<string>("API_VERSION") || "v1";
-  app.setGlobalPrefix(`${prefix}/${version}`);
+  SwaggerModule.setup("api/v1/docs", app, document, customOptions);
 
   // Log connection details
   const mongoURI = configService.get<string>("MONGODB_URI") || "mongodb://localhost:27017/penpal-ai";
@@ -124,6 +126,7 @@ async function bootstrap() {
   // Start server
   await app.listen(configService.get<number>("PORT") || 3001);
   logger.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`API documentation available at: ${await app.getUrl()}/api/docs`);
   logger.log("API is ready to accept connections");
 }
 

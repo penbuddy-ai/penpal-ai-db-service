@@ -83,22 +83,4 @@ export class CreateLanguageDto {
     grammarGuideUrl: string;
     pronunciationGuideUrl: string;
   };
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the language was created",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  createdAt?: Date;
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the language was last updated",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  updatedAt?: Date;
 }

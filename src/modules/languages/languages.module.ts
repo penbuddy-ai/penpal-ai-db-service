@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 
 import { LanguagesController } from "./languages.controller";
@@ -13,7 +13,7 @@ import { UserLanguage, UserLanguageSchema } from "./schemas/user-language.schema
       { name: UserLanguage.name, schema: UserLanguageSchema },
     ]),
   ],
-  providers: [LanguagesService],
+  providers: [LanguagesService, Logger],
   controllers: [LanguagesController],
   exports: [MongooseModule, LanguagesService],
 })
