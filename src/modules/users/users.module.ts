@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 
 import { UserRole, UserRoleSchema } from "./schemas/user-role.schema";
@@ -13,7 +13,7 @@ import { UserService } from "./users.service";
       { name: UserRole.name, schema: UserRoleSchema },
     ]),
   ],
-  providers: [UserService],
+  providers: [UserService, Logger],
   controllers: [UsersController],
   exports: [UserService],
 })

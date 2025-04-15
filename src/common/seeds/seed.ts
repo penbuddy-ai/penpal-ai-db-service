@@ -93,7 +93,6 @@ async function bootstrap() {
         isVerified: true,
         learningLanguages: [frenchLanguage._id.toString()],
         nativeLanguage: englishLanguage._id.toString(),
-        lastActive: new Date(),
         status: "active",
         preferences: {
           notifications: true,
@@ -105,9 +104,6 @@ async function bootstrap() {
           vocabularySize: 0,
           grammarAccuracy: 0,
         },
-        lastLogin: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       const createdUser = await userService.create(adminUser) as User & { _id: Types.ObjectId };

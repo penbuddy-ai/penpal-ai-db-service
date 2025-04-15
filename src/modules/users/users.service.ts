@@ -1,67 +1,166 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UserRole } from "./schemas/user-role.schema";
-import { User } from "./schemas/user.schema";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserRole, UserRoleDocument } from "./schemas/user-role.schema";
+import { User, UserDocument } from "./schemas/user.schema";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(UserRole.name) private readonly userRoleModel: Model<UserRole>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(UserRole.name) private readonly userRoleModel: Model<UserRoleDocument>,
+    private readonly logger: Logger,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdUser = new this.userModel(createUserDto);
-    return createdUser.save();
-  }
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+    try {
+      const existingUser = await this.findByEmail(createUserDto.email);
+      if (existingUser) {
+        throw new ConflictException("User with this email already exists");
+      }
 
-  async findAll(limit?: number, offset?: number): Promise<User[]> {
-    let query = this.userModel.find();
-
-    if (offset) {
-      query = query.skip(offset);
+      const createdUser = new this.userModel(createUserDto);
+      return await createdUser.save();
     }
-
-    if (limit) {
-      query = query.limit(limit);
+    catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      this.logger.error(`Error creating user: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to create user");
     }
-
-    return query.exec();
   }
 
-  async findOne(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec();
+  async findAll(limit?: number, offset?: number): Promise<UserDocument[]> {
+    try {
+      let query = this.userModel.find();
+
+      if (offset) {
+        query = query.skip(offset);
+      }
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      return await query.exec();
+    }
+    catch (error) {
+      this.logger.error(`Error finding all users: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to retrieve users");
+    }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).exec();
+  async findOne(id: string): Promise<UserDocument> {
+    try {
+      const user = await this.userModel.findById(id).exec();
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      return user;
+    }
+    catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(`Error finding user: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to retrieve user");
+    }
   }
 
-  async update(id: string, updateUserDto: Partial<CreateUserDto>): Promise<User | null> {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    try {
+      return await this.userModel.findOne({ email }).exec();
+    }
+    catch (error) {
+      this.logger.error(`Error finding user by email: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to find user by email");
+    }
   }
 
-  async remove(id: string): Promise<User | null> {
-    return this.userModel.findByIdAndDelete(id).exec();
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDocument> {
+    try {
+      const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+      if (!updatedUser) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      return updatedUser;
+    }
+    catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(`Error updating user: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to update user");
+    }
   }
 
-  async assignRole(userId: string, roleId: string): Promise<UserRole> {
-    const userRole = new this.userRoleModel({
-      userId,
-      roleId,
-      assignedAt: new Date(),
-    });
-    return userRole.save();
+  async remove(id: string): Promise<UserDocument> {
+    try {
+      const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
+      if (!deletedUser) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      return deletedUser;
+    }
+    catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(`Error removing user: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to delete user");
+    }
   }
 
-  async getUserRoles(userId: string): Promise<UserRole[]> {
-    return this.userRoleModel.find({ userId }).populate("roleId").exec();
+  async assignRole(userId: string, roleId: string): Promise<UserRoleDocument> {
+    try {
+      const existingUserRole = await this.userRoleModel.findOne({ userId, roleId }).exec();
+      if (existingUserRole) {
+        throw new ConflictException("User already has this role");
+      }
+
+      const userRole = new this.userRoleModel({
+        userId,
+        roleId,
+        assignedAt: new Date(),
+      });
+      return await userRole.save();
+    }
+    catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      this.logger.error(`Error assigning role: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to assign role to user");
+    }
+  }
+
+  async getUserRoles(userId: string): Promise<UserRoleDocument[]> {
+    try {
+      return await this.userRoleModel.find({ userId }).populate("roleId").exec();
+    }
+    catch (error) {
+      this.logger.error(`Error getting user roles: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to retrieve user roles");
+    }
   }
 
   async removeRole(userId: string, roleId: string): Promise<void> {
-    await this.userRoleModel.deleteOne({ userId, roleId }).exec();
+    try {
+      const result = await this.userRoleModel.deleteOne({ userId, roleId }).exec();
+      if (result.deletedCount === 0) {
+        throw new NotFoundException("User role not found");
+      }
+    }
+    catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(`Error removing role: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to remove role from user");
+    }
   }
 }

@@ -7,7 +7,7 @@ import { CreateUserDto } from "./create-user.dto";
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({
     example: "john.updated@example.com",
-    description: "Updated email address of the user",
+    description: "Updated email address of the user (optional)",
     required: false,
   })
   @IsOptional()
@@ -16,7 +16,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "newpassword123",
-    description: "Updated user password (will be hashed)",
+    description: "Updated user password (optional)",
     required: false,
   })
   @IsOptional()
@@ -25,7 +25,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "Johnny",
-    description: "Updated first name of the user",
+    description: "Updated first name of the user (optional)",
     required: false,
   })
   @IsOptional()
@@ -34,7 +34,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "Doeson",
-    description: "Updated last name of the user",
+    description: "Updated last name of the user (optional)",
     required: false,
   })
   @IsOptional()
@@ -43,7 +43,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "https://example.com/updated-profile.jpg",
-    description: "Updated URL to the user's profile picture",
+    description: "Updated URL to the user's profile picture (optional)",
     required: false,
   })
   @IsOptional()
@@ -52,7 +52,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: false,
-    description: "Updated account status (active/inactive)",
+    description: "Updated account status - active/inactive (optional)",
     required: false,
   })
   @IsOptional()
@@ -61,7 +61,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: true,
-    description: "Updated verification status",
+    description: "Updated verification status (optional)",
     required: false,
   })
   @IsOptional()
@@ -70,7 +70,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: ["6075a1f3ca218f001c8f1850", "6075a1faca218f001c8f1852", "6075a1fbca218f001c8f1853"],
-    description: "Updated list of language IDs the user is learning",
+    description: "Updated list of language IDs the user is learning (optional)",
     type: [String],
     required: false,
   })
@@ -81,7 +81,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "6075a1e5ca218f001c8f184f",
-    description: "Updated ID of the user's native language",
+    description: "Updated ID of the user's native language (optional)",
     required: false,
   })
   @IsOptional()
@@ -94,7 +94,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
       darkMode: true,
       language: "fr",
     },
-    description: "Updated user preferences settings",
+    description: "Updated user preferences settings (optional)",
     required: false,
   })
   @IsOptional()
@@ -111,7 +111,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
       vocabularySize: 420,
       grammarAccuracy: 0.92,
     },
-    description: "Updated user learning statistics",
+    description: "Updated user learning statistics (optional)",
     required: false,
   })
   @IsOptional()
@@ -124,7 +124,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "2023-04-15T12:00:00.000Z",
-    description: "Updated timestamp of the user's last activity",
+    description: "Updated timestamp of the user's last activity (optional)",
     required: false,
   })
   @IsOptional()
@@ -134,7 +134,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "inactive",
-    description: "Updated user status",
+    description: "Updated user status (optional)",
     enum: ["active", "inactive", "suspended"],
     required: false,
   })
@@ -144,7 +144,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({
     example: "2023-04-15T12:00:00.000Z",
-    description: "Updated timestamp of the user's last login",
+    description: "Updated timestamp of the user's last login (optional)",
     required: false,
   })
   @IsOptional()

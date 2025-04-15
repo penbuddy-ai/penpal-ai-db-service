@@ -4,7 +4,8 @@ import { IsArray, IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, 
 export class CreateUserDto {
   @ApiProperty({
     example: "john.doe@example.com",
-    description: "Email address of the user",
+    description: "Email address of the user (required)",
+    required: true,
   })
   @IsEmail()
   @IsNotEmpty()
@@ -12,8 +13,9 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: "password123",
-    description: "User password (will be hashed)",
+    description: "User password - minimum 6 characters (required)",
     minLength: 6,
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -22,7 +24,8 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: "John",
-    description: "First name of the user",
+    description: "First name of the user (required)",
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -30,7 +33,8 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: "Doe",
-    description: "Last name of the user",
+    description: "Last name of the user (required)",
+    required: true,
   })
   @IsString()
   @IsNotEmpty()
@@ -38,7 +42,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: "https://example.com/profile.jpg",
-    description: "URL to the user's profile picture",
+    description: "URL to the user's profile picture (optional)",
     required: false,
   })
   @IsString()
@@ -47,7 +51,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: true,
-    description: "Whether the user account is active",
+    description: "Whether the user account is active (optional)",
     default: true,
     required: false,
   })
@@ -57,7 +61,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: false,
-    description: "Whether the user's email has been verified",
+    description: "Whether the user's email has been verified (optional)",
     default: false,
     required: false,
   })
@@ -67,7 +71,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: ["6075a1f3ca218f001c8f1850", "6075a1faca218f001c8f1852"],
-    description: "IDs of languages the user is learning",
+    description: "IDs of languages the user is learning (optional)",
     type: [String],
     required: false,
   })
@@ -78,7 +82,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     example: "6075a1e5ca218f001c8f184e",
-    description: "ID of the user's native language",
+    description: "ID of the user's native language (optional)",
     required: false,
   })
   @IsString()
@@ -86,17 +90,8 @@ export class CreateUserDto {
   nativeLanguage?: string;
 
   @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp of the user's last activity",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  lastActive?: Date;
-
-  @ApiProperty({
     example: "active",
-    description: "The current status of the user account",
+    description: "The current status of the user account (optional)",
     enum: ["active", "inactive", "suspended"],
     default: "active",
     required: false,
@@ -111,7 +106,7 @@ export class CreateUserDto {
       darkMode: false,
       language: "en",
     },
-    description: "User preferences settings",
+    description: "User preferences settings (optional)",
     required: false,
   })
   @IsOptional()
@@ -127,7 +122,7 @@ export class CreateUserDto {
       vocabularySize: 0,
       grammarAccuracy: 0,
     },
-    description: "User learning statistics",
+    description: "User learning statistics (optional)",
     required: false,
   })
   @IsOptional()
@@ -136,31 +131,4 @@ export class CreateUserDto {
     vocabularySize: number;
     grammarAccuracy: number;
   };
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp of the user's last login",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  lastLogin?: Date;
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the user was created",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  createdAt?: Date;
-
-  @ApiProperty({
-    example: "2023-04-14T12:00:00.000Z",
-    description: "Timestamp when the user was last updated",
-    required: false,
-  })
-  @IsDate()
-  @IsOptional()
-  updatedAt?: Date;
 }
