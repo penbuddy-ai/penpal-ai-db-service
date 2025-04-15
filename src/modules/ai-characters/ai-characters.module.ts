@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 
 import { AICharactersController } from "./ai-characters.controller";
@@ -11,7 +11,7 @@ import { AICharacter, AICharacterSchema } from "./schemas/ai-character.schema";
       { name: AICharacter.name, schema: AICharacterSchema },
     ]),
   ],
-  providers: [AICharacterService],
+  providers: [AICharacterService, Logger],
   controllers: [AICharactersController],
   exports: [AICharacterService],
 })
