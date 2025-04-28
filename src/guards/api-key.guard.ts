@@ -8,7 +8,7 @@ export class ApiKeyGuard implements CanActivate {
   private readonly apiKey: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.apiKey = this.configService.get<string>("INTERNAL_API_KEY");
+    this.apiKey = this.configService.get<string>("INTERNAL_API_KEY") || "";
 
     if (!this.apiKey) {
       this.logger.error("INTERNAL_API_KEY environment variable not set");

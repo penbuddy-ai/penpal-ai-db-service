@@ -131,7 +131,7 @@ export class OAuthUserService {
         }
       }
       catch (error) {
-        this.logger.warn(`Native language not found: ${oauthUserDto.nativeLanguageCode}`);
+        this.logger.warn(`Native language not found: ${oauthUserDto.nativeLanguageCode}`, error);
       }
     }
 
@@ -146,7 +146,7 @@ export class OAuthUserService {
           }
         }
         catch (error) {
-          this.logger.warn(`Learning language not found: ${code}`);
+          this.logger.warn(`Learning language not found: ${code}`, error);
         }
       }
     }

@@ -9,7 +9,7 @@ export class ServiceAuthGuard implements CanActivate {
   private readonly allowedServices: string[];
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>("INTERNAL_API_KEY");
+    this.apiKey = this.configService.get<string>("INTERNAL_API_KEY") || "";
     this.allowedServices = this.configService.get<string>("ALLOWED_SERVICES")?.split(",") || ["auth-service"];
 
     if (!this.apiKey) {
