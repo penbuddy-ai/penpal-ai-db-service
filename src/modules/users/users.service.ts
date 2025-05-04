@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import * as argon2 from "argon2";
 import { Model } from "mongoose";
 
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -20,6 +21,10 @@ export class UserService {
       const existingUser = await this.findByEmail(createUserDto.email);
       if (existingUser) {
         throw new ConflictException("User with this email already exists");
+      }
+
+      if (createUserDto.password) {
+        createUserDto.password = await argon2.hash(createUserDto.password);
       }
 
       const createdUser = new this.userModel(createUserDto);
@@ -83,6 +88,10 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDocument> {
     try {
+      if (updateUserDto.password) {
+        updateUserDto.password = await argon2.hash(updateUserDto.password);
+      }
+
       const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
       if (!updatedUser) {
         throw new NotFoundException(`User with ID ${id} not found`);

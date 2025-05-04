@@ -9,7 +9,7 @@ import { AppModule } from "./app.module";
 import { LoggingInterceptor } from "./interceptors/logging.interceptor";
 
 async function bootstrap() {
-  const logger = new Logger("Bootstrap");
+  const logger = new Logger("Database Service");
   logger.log("Starting Penpal AI Database Service...");
 
   const app = await NestFactory.create(AppModule, {
