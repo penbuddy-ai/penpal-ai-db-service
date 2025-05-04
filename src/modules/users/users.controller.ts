@@ -1,6 +1,8 @@
 import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Logger, NotFoundException, Param, Post, Put, Query, UseInterceptors } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Logger, NotFoundException, Param, Post, Put, Query, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiBody, ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+
+import { ServiceAuthGuard } from "src/common/guards/service-auth.guard";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -9,6 +11,17 @@ import { UserService } from "./users.service";
 
 @ApiTags("users")
 @Controller("users")
+@UseGuards(ServiceAuthGuard)
+@ApiHeader({
+  name: "x-api-key",
+  description: "Clé API pour l'authentification inter-services",
+  required: true,
+})
+@ApiHeader({
+  name: "x-service-name",
+  description: "Nom du service appelant (ex: auth-service)",
+  required: true,
+})
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 

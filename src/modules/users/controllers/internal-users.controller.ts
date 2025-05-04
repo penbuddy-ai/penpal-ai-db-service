@@ -7,8 +7,8 @@ import { User, UserDocument } from "../schemas/user.schema";
 import { OAuthUserService } from "../services/oauth-user.service";
 import { UserService } from "../users.service";
 
-@ApiTags("internal")
-@Controller("internal/users")
+@ApiTags("users")
+@Controller("users")
 @UseGuards(ServiceAuthGuard)
 @ApiHeader({
   name: "x-api-key",
