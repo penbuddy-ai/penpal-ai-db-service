@@ -36,6 +36,16 @@ export class OAuthUserDto {
   @Type(() => OAuthProfileDto)
   profile: OAuthProfileDto;
 
+  @ApiProperty({ example: "John", description: "User's first name" })
+  @IsString()
+  @IsOptional()
+  firstName?: string;
+
+  @ApiProperty({ example: "Doe", description: "User's last name" })
+  @IsString()
+  @IsOptional()
+  lastName?: string;
+
   @ApiProperty({ example: "fr", description: "User's native language code" })
   @IsString()
   @IsOptional()

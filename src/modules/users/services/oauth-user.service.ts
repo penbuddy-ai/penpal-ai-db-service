@@ -60,9 +60,19 @@ export class OAuthUserService {
           user.learningLanguages = [...user.learningLanguages, ...newLanguages];
         }
 
-        if (!user.firstName && profile.displayName) {
+        if (!user.firstName && oauthUserDto.firstName) {
+          user.firstName = oauthUserDto.firstName;
+        }
+        else if (!user.firstName && profile.displayName) {
           const nameParts = profile.displayName.split(" ");
           user.firstName = nameParts[0] || "User";
+        }
+
+        if (!user.lastName && oauthUserDto.lastName) {
+          user.lastName = oauthUserDto.lastName;
+        }
+        else if (!user.lastName && profile.displayName) {
+          const nameParts = profile.displayName.split(" ");
           user.lastName = nameParts.slice(1).join(" ") || `${profile.provider.charAt(0).toUpperCase() + profile.provider.slice(1)}User`;
         }
 
@@ -75,10 +85,10 @@ export class OAuthUserService {
       else {
         this.logger.log(`Creating new user from OAuth profile: ${profile.email}`);
 
-        let firstName = "User";
-        let lastName = `${profile.provider.charAt(0).toUpperCase() + profile.provider.slice(1)}User`;
+        let firstName = oauthUserDto.firstName || "User";
+        let lastName = oauthUserDto.lastName || `${profile.provider.charAt(0).toUpperCase() + profile.provider.slice(1)}User`;
 
-        if (profile.displayName) {
+        if (!oauthUserDto.firstName && !oauthUserDto.lastName && profile.displayName) {
           const nameParts = profile.displayName.split(" ");
           firstName = nameParts[0];
           lastName = nameParts.slice(1).join(" ") || lastName;
