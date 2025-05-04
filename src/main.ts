@@ -126,7 +126,7 @@ async function bootstrap() {
   // Start server
   await app.listen(configService.get<number>("PORT") || 3001);
   logger.log(`Application is running on: ${await app.getUrl()}`);
-  logger.log(`API documentation available at: ${await app.getUrl()}/api/docs`);
+  logger.log(`API documentation available at: ${await app.getUrl()}${globalPrefix}/docs`);
   logger.log("API is ready to accept connections");
 }
 
