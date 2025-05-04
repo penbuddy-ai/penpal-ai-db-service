@@ -14,7 +14,7 @@ services:
       - "3001:3001"
     command: npm run start:dev
     env_file:
-      - .env
+      - ./db-service/.env
     depends_on:
       mongodb:
         condition: service_healthy
@@ -24,6 +24,34 @@ services:
       - penpal-network
     healthcheck:
       test: [CMD, curl, -f, "http://localhost:3001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  auth-service:
+    build:
+      context: ../../penpal-ai-auth-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-auth-service
+    volumes:
+      - ../../penpal-ai-auth-service:/app
+      - /app/node_modules
+    ports:
+      - "3002:3002"
+    command: npm run start:dev
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3002/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
