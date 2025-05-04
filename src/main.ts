@@ -9,7 +9,7 @@ import { AppModule } from "./app.module";
 import { LoggingInterceptor } from "./interceptors/logging.interceptor";
 
 async function bootstrap() {
-  const logger = new Logger("Bootstrap");
+  const logger = new Logger("Database Service");
   logger.log("Starting Penpal AI Database Service...");
 
   const app = await NestFactory.create(AppModule, {
@@ -126,7 +126,7 @@ async function bootstrap() {
   // Start server
   await app.listen(configService.get<number>("PORT") || 3001);
   logger.log(`Application is running on: ${await app.getUrl()}`);
-  logger.log(`API documentation available at: ${await app.getUrl()}/api/docs`);
+  logger.log(`API documentation available at: ${await app.getUrl()}${globalPrefix}/docs`);
   logger.log("API is ready to accept connections");
 }
 

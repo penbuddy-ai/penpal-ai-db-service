@@ -27,8 +27,8 @@ export class User extends Document {
     description: "The hashed password of the user",
     writeOnly: true,
   })
-  @Prop({ required: true })
-  password: string;
+  @Prop({ required: false }) // Pas toujours requis pour OAuth
+  password?: string;
 
   @ApiProperty({
     example: "John",
@@ -155,6 +155,38 @@ export class User extends Document {
   lastLogin: Date;
 
   @ApiProperty({
+    example: [{
+      provider: "google",
+      providerId: "123456789",
+      email: "john.doe@gmail.com",
+      displayName: "John Doe",
+      photoURL: "https://lh3.googleusercontent.com/a/photo",
+      accessToken: "ya29.a0Ae...",
+      refreshToken: "1//0eXy...",
+    }],
+    description: "OAuth profiles linked to this user",
+  })
+  @Prop({ type: [Object], default: [] })
+  oauthProfiles: {
+    provider: string;
+    providerId: string;
+    email: string;
+    displayName?: string;
+    photoURL?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+  }[];
+
+  @ApiProperty({
+    example: "local",
+    description: "The primary auth method used by this user (local, google, facebook, etc.)",
+    enum: ["local", "google", "facebook", "apple", "github"],
+  })
+  @Prop({ default: "local" })
+  authMethod: string;
+
+  @ApiProperty({
     example: "2023-04-14T12:00:00.000Z",
     description: "Timestamp when the user was created",
   })
@@ -173,6 +205,7 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 // Indexes
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ "oauthProfiles.provider": 1, "oauthProfiles.providerId": 1 });
 UserSchema.index({ status: 1 });
 UserSchema.index({ lastActive: 1 });
 UserSchema.index({ learningLanguages: 1 });
