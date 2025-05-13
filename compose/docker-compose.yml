@@ -66,12 +66,15 @@ services:
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
+      - ./mongodb/init:/docker-entrypoint-initdb.d
     networks:
       - penpal-network
     environment:
       - MONGO_INITDB_DATABASE=penpal-ai
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_USERNAME=penpal_user
+      - MONGO_INITDB_PASSWORD=penpal_password
     command: [--auth, --bind_ip_all]
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u admin -p admin123 --quiet
