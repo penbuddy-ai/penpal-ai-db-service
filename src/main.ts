@@ -88,6 +88,8 @@ async function bootstrap() {
     .addTag("users", "Gestion des utilisateurs")
     .addTag("roles", "Gestion des rôles et permissions")
     .addTag("ai-characters", "Gestion des personnages IA")
+    .addTag("conversations", "Gestion des conversations avec les personnages IA")
+    .addTag("messages", "Gestion des messages dans les conversations")
     .addTag("health", "Monitoring et statut de l'API")
     .addServer(`http://localhost:${configService.get<number>("PORT") || 3001}`)
     .build();
