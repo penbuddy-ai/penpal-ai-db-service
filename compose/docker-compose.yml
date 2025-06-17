@@ -57,40 +57,68 @@ services:
       retries: 3
       start_period: 40s
 
-  frontend-service:
+  payment-service:
     build:
-      context: ../../penpal-frontend
+      context: ../../penpal-payment-service
       dockerfile: Dockerfile
       target: development
-      args:
-        - NODE_ENV=development
-    container_name: penpal-ai-frontend
+    container_name: penpal-ai-payment-service
     volumes:
-      - ../../penpal-frontend:/app
+      - ../../penpal-payment-service:/app
       - /app/node_modules
-      - /app/.next
     ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
-      - PORT=3000
+      - "3003:3003"
+    command: npm run start:dev
     env_file:
-      - ./frontend-service/.env
+      - ./payment-service/.env
     depends_on:
-      db-service:
+      mongodb:
         condition: service_healthy
-      auth-service:
+      redis:
         condition: service_healthy
     networks:
       - penpal-network
     healthcheck:
-      test: [CMD, wget, --no-verbose, --tries=1, --spider, http://localhost:3000/api/health]
+      test: [CMD, curl, -f, "http://localhost:3003/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    command: npm run dev
+
+  # frontend-service:
+  #   build:
+  #     context: ../../penpal-frontend
+  #     dockerfile: Dockerfile
+  #     target: development
+  #     args:
+  #       - NODE_ENV=development
+  #   container_name: penpal-ai-frontend
+  #   volumes:
+  #     - ../../penpal-frontend:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - NEXT_TELEMETRY_DISABLED=1
+  #     - PORT=3000
+  #   env_file:
+  #     - ./frontend-service/.env
+  #   depends_on:
+  #     db-service:
+  #       condition: service_healthy
+  #     auth-service:
+  #       condition: service_healthy
+  #   networks:
+  #     - penpal-network
+  #   healthcheck:
+  #     test: [CMD, wget, --no-verbose, --tries=1, --spider, http://localhost:3000/api/health]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   command: npm run dev
 
   mongodb:
     image: mongo:6.0

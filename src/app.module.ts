@@ -1,6 +1,17 @@
-import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit, RequestMethod } from "@nestjs/common";
+import {
+  Logger,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+  RequestMethod,
+} from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { InjectConnection, MongooseModule, MongooseModuleOptions } from "@nestjs/mongoose";
+import {
+  InjectConnection,
+  MongooseModule,
+  MongooseModuleOptions,
+} from "@nestjs/mongoose";
 import { Connection } from "mongoose";
 
 import { AppController } from "./app.controller";
@@ -25,8 +36,13 @@ import { UsersModule } from "./modules/users/users.module";
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const logger = new Logger("MongoDB");
-        const mongoUri = configService.get<string>("MONGODB_URI") || "mongodb://localhost:27017/penpal-ai";
-        const sanitizedMongoURI = mongoUri.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@");
+        const mongoUri
+          = configService.get<string>("MONGODB_URI")
+            || "mongodb://localhost:27017/penpal-ai";
+        const sanitizedMongoURI = mongoUri.replace(
+          /\/\/([^:]+):([^@]+)@/,
+          "//***:***@",
+        );
 
         logger.log(`Configuring MongoDB connection: ${sanitizedMongoURI}`);
 
@@ -80,7 +96,9 @@ export class AppModule implements NestModule, OnModuleInit {
           const dbStats = await db.stats();
           const dbName = db.databaseName;
           if (dbStats && dbName) {
-            this.logger.log(`Connected to database: ${dbName} (Collections: ${dbStats.collections}, Documents: ${dbStats.objects})`);
+            this.logger.log(
+              `Connected to database: ${dbName} (Collections: ${dbStats.collections}, Documents: ${dbStats.objects})`,
+            );
           }
         }
       }
@@ -89,7 +107,9 @@ export class AppModule implements NestModule, OnModuleInit {
       }
     }
     else {
-      this.logger.error(`❌ Failed to connect to MongoDB. Connection state: ${this.connection.readyState}`);
+      this.logger.error(
+        `❌ Failed to connect to MongoDB. Connection state: ${this.connection.readyState}`,
+      );
     }
   }
 

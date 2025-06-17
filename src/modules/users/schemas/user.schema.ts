@@ -14,7 +14,6 @@ export class User extends Document {
     description: "The unique identifier of the user",
   })
   // _id est hérité de Document
-
   @ApiProperty({
     example: "john.doe@example.com",
     description: "The email address of the user",
@@ -43,6 +42,13 @@ export class User extends Document {
   })
   @Prop({ required: true })
   lastName: string;
+
+  @ApiProperty({
+    example: "Johnny",
+    description: "The preferred name for the user (how they want to be called)",
+  })
+  @Prop()
+  preferredName: string;
 
   @ApiProperty({
     example: "https://example.com/profile.jpg",
@@ -79,6 +85,24 @@ export class User extends Document {
   })
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Language" })
   nativeLanguage: Language;
+
+  @ApiProperty({
+    example: {
+      en: "intermediate",
+      fr: "beginner",
+      es: "advanced",
+    },
+    description: "Proficiency levels for each learning language",
+  })
+  @Prop({ type: Object, default: {} })
+  proficiencyLevels: Record<string, string>;
+
+  @ApiProperty({
+    example: false,
+    description: "Whether the user has completed the onboarding process",
+  })
+  @Prop({ default: false })
+  onboardingCompleted: boolean;
 
   @ApiProperty({
     example: 5,
@@ -144,7 +168,9 @@ export class User extends Document {
     description: "IDs of conversations the user is participating in",
     type: [String],
   })
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: "Conversation" }] })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: "Conversation" }],
+  })
   conversations: Conversation[];
 
   @ApiProperty({
@@ -155,15 +181,17 @@ export class User extends Document {
   lastLogin: Date;
 
   @ApiProperty({
-    example: [{
-      provider: "google",
-      providerId: "123456789",
-      email: "john.doe@gmail.com",
-      displayName: "John Doe",
-      photoURL: "https://lh3.googleusercontent.com/a/photo",
-      accessToken: "ya29.a0Ae...",
-      refreshToken: "1//0eXy...",
-    }],
+    example: [
+      {
+        provider: "google",
+        providerId: "123456789",
+        email: "john.doe@gmail.com",
+        displayName: "John Doe",
+        photoURL: "https://lh3.googleusercontent.com/a/photo",
+        accessToken: "ya29.a0Ae...",
+        refreshToken: "1//0eXy...",
+      },
+    ],
     description: "OAuth profiles linked to this user",
   })
   @Prop({ type: [Object], default: [] })
@@ -180,7 +208,8 @@ export class User extends Document {
 
   @ApiProperty({
     example: "local",
-    description: "The primary auth method used by this user (local, google, facebook, etc.)",
+    description:
+      "The primary auth method used by this user (local, google, facebook, etc.)",
     enum: ["local", "google", "facebook", "apple", "github"],
   })
   @Prop({ default: "local" })
@@ -199,13 +228,39 @@ export class User extends Document {
   })
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  @ApiProperty({
+    example: "monthly",
+    description: "The subscription plan chosen by the user",
+    enum: ["monthly", "yearly"],
+  })
+  @Prop({ enum: ["monthly", "yearly"] })
+  subscriptionPlan?: string;
+
+  @ApiProperty({
+    example: "trial",
+    description: "The subscription status of the user",
+    enum: ["trial", "active", "past_due", "canceled", "unpaid"],
+  })
+  @Prop({ enum: ["trial", "active", "past_due", "canceled", "unpaid"] })
+  subscriptionStatus?: string;
+
+  @ApiProperty({
+    example: "2023-04-14T12:00:00.000Z",
+    description: "Timestamp when the subscription trial ends",
+  })
+  @Prop()
+  subscriptionTrialEnd?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
 // Indexes
 UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ "oauthProfiles.provider": 1, "oauthProfiles.providerId": 1 });
+UserSchema.index({
+  "oauthProfiles.provider": 1,
+  "oauthProfiles.providerId": 1,
+});
 UserSchema.index({ status: 1 });
 UserSchema.index({ lastActive: 1 });
 UserSchema.index({ learningLanguages: 1 });
