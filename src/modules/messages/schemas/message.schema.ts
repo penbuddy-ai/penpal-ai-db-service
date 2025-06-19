@@ -1,55 +1,62 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { ApiProperty } from "@nestjs/swagger";
 import { Document, Schema as MongooseSchema } from "mongoose";
-
-import { Conversation } from "../../conversations/schemas/conversation.schema";
-import { User } from "../../users/schemas/user.schema";
 
 export type MessageDocument = Message & Document;
 
-@Schema({ timestamps: true })
+@Schema()
 export class Message extends Document {
+  @ApiProperty({
+    description: "Conversation ID this message belongs to",
+  })
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: "Conversation", required: true })
-  conversationId: Conversation;
+  conversationId: MongooseSchema.Types.ObjectId;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: "User", required: true })
-  userId: User;
+  @ApiProperty({
+    example: "user",
+    description: "Sender of the message (user or ai)",
+    enum: ["user", "ai"],
+  })
+  @Prop({ required: true, enum: ["user", "ai"] })
+  sender: string;
 
+  @ApiProperty({
+    example: "Hello! How are you today?",
+    description: "Content of the message",
+  })
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true, enum: ["user", "ai"] })
-  senderType: string;
+  @ApiProperty({
+    example: "2023-04-14T12:00:00.000Z",
+    description: "Timestamp when the message was sent",
+  })
+  @Prop({ default: Date.now })
+  timestamp: Date;
 
-  @Prop({ type: Object })
-  metadata: {
-    language: string;
-    difficulty: number;
-    grammarScore: number;
-    vocabularyScore: number;
-  };
-
-  @Prop({ type: [String], default: [] })
-  corrections: string[];
-
-  @Prop({ type: Object })
-  feedback: {
-    rating: number;
-    comment: string;
-    timestamp: Date;
-  };
-
+  @ApiProperty({
+    example: true,
+    description: "Whether the message has been read",
+  })
   @Prop({ default: false })
-  isEdited: boolean;
+  isRead: boolean;
 
-  @Prop({ default: false })
-  isDeleted: boolean;
+  @ApiProperty({
+    example: {
+      grammar: ["Error 1", "Error 2"],
+      vocabulary: ["Suggestion 1"],
+      pronunciation: [],
+    },
+    description: "Corrections and suggestions for language learning",
+    required: false,
+  })
+  @Prop({ type: Object, default: {} })
+  corrections?: Record<string, any>;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);
 
 // Indexes
 MessageSchema.index({ conversationId: 1 });
-MessageSchema.index({ userId: 1 });
-MessageSchema.index({ senderType: 1 });
-MessageSchema.index({ createdAt: 1 });
-MessageSchema.index({ "metadata.language": 1 });
+MessageSchema.index({ timestamp: -1 });
+MessageSchema.index({ sender: 1 });

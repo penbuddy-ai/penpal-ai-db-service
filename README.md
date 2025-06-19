@@ -124,6 +124,27 @@ The API is accessible at `http://localhost:3001/api/v1` and the Swagger document
 - `PUT /ai-characters/:id` - Update an AI character
 - `DELETE /ai-characters/:id` - Delete an AI character
 
+#### Conversations
+
+- `GET /conversations` - List all conversations with pagination and filtering
+- `GET /conversations/:id` - Get conversation details
+- `GET /conversations/user/:userId` - Get all conversations for a specific user
+- `POST /conversations` - Create a new conversation
+- `PATCH /conversations/:id` - Update a conversation
+- `DELETE /conversations/:id` - Soft delete a conversation (sets status to deleted)
+- `DELETE /conversations/:id/hard` - Hard delete a conversation (removes from database)
+
+#### Messages
+
+- `GET /messages?conversationId=:id` - List all messages for a conversation with pagination and filtering
+- `GET /messages/:id` - Get message details
+- `POST /messages` - Create a new message
+- `PATCH /messages/:id` - Update a message
+- `PATCH /messages/:id/read` - Mark a message as read
+- `PATCH /messages/:id/corrections` - Add corrections to a message
+- `DELETE /messages/:id` - Delete a message
+- `DELETE /messages/conversation/:conversationId` - Delete all messages for a conversation
+
 ## Redis Caching System
 
 The service uses Redis as a caching system to optimize the performance of frequently accessed requests.
@@ -151,6 +172,11 @@ The following routes use Redis caching:
 - `GET /roles/:name` - Role details (TTL: 3600s)
 - `GET /ai-characters` - List of AI characters (TTL: 3600s)
 - `GET /ai-characters/:id` - AI character details (TTL: 3600s)
+- `GET /conversations` - List of conversations (TTL: 3600s)
+- `GET /conversations/:id` - Conversation details (TTL: 3600s)
+- `GET /conversations/user/:userId` - List of conversations for a user (TTL: 3600s)
+- `GET /messages?conversationId=:id` - List of messages for a conversation (TTL: 3600s)
+- `GET /messages/:id` - Message details (TTL: 3600s)
 
 ## Environment Variables
 

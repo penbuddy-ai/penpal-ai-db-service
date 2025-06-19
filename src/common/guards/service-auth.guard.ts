@@ -10,7 +10,7 @@ export class ServiceAuthGuard implements CanActivate {
 
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get<string>("INTERNAL_API_KEY") || "";
-    this.allowedServices = this.configService.get<string>("ALLOWED_SERVICES")?.split(",") || ["auth-service"];
+    this.allowedServices = this.configService.get<string>("ALLOWED_SERVICES")?.split(",") || ["auth-service", "ai-service", "payment-service"];
 
     if (!this.apiKey) {
       this.logger.warn("INTERNAL_API_KEY is not set. Service authentication is disabled!");

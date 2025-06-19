@@ -23,7 +23,9 @@ import { CacheModule } from "./modules/cache/cache.module";
 import { ConversationsModule } from "./modules/conversations/conversations.module";
 import { LanguagesModule } from "./modules/languages/languages.module";
 import { MessagesModule } from "./modules/messages/messages.module";
+import { PaymentsModule } from "./modules/payments/payments.module";
 import { RolesModule } from "./modules/roles/roles.module";
+import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { UsersModule } from "./modules/users/users.module";
 
 @Module({
@@ -76,6 +78,8 @@ import { UsersModule } from "./modules/users/users.module";
     ConversationsModule,
     MessagesModule,
     LanguagesModule,
+    PaymentsModule,
+    SubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

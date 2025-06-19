@@ -30,10 +30,6 @@ export class UserService {
         throw new ConflictException("User with this email already exists");
       }
 
-      if (createUserDto.password) {
-        createUserDto.password = await argon2.hash(createUserDto.password);
-      }
-
       const createdUser = new this.userModel(createUserDto);
       return await createdUser.save();
     }
