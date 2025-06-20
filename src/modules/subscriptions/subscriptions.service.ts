@@ -252,6 +252,68 @@ export class SubscriptionsService {
     }
   }
 
+  /**
+   * Get subscription status in auth-service compatible format
+   */
+  async getStatusForAuthService(userId: string): Promise<{
+    hasSubscription: boolean;
+    isActive: boolean;
+    plan: "monthly" | "yearly" | null;
+    status: "trial" | "active" | "past_due" | "canceled" | "unpaid" | null;
+    trialActive: boolean;
+    daysRemaining: number;
+    nextBillingDate?: Date;
+    cancelAtPeriodEnd?: boolean;
+  }> {
+    try {
+      const subscription = await this.findByUserId(userId);
+      if (!subscription) {
+        return {
+          hasSubscription: false,
+          isActive: false,
+          plan: null,
+          status: null,
+          trialActive: false,
+          daysRemaining: 0,
+        };
+      }
+
+      const now = new Date();
+      const isTrialActive = subscription.isTrialActive === true
+        && subscription.trialEnd
+        && subscription.trialEnd > now;
+
+      const isPaidActive = subscription.status === SubscriptionStatus.ACTIVE
+        && subscription.currentPeriodEnd
+        && subscription.currentPeriodEnd > now;
+
+      const isActive = Boolean(isTrialActive || isPaidActive);
+
+      let daysRemaining = 0;
+      if (isTrialActive && subscription.trialEnd) {
+        daysRemaining = Math.ceil((subscription.trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      }
+      else if (isPaidActive && subscription.currentPeriodEnd) {
+        daysRemaining = Math.ceil((subscription.currentPeriodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      }
+
+      return {
+        hasSubscription: true,
+        isActive,
+        plan: subscription.plan,
+        status: subscription.status,
+        trialActive: Boolean(isTrialActive),
+        daysRemaining: Math.max(0, daysRemaining),
+        nextBillingDate: subscription.nextBillingDate,
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      };
+    }
+    catch (error) {
+      this.logger.error(`Error getting subscription status for auth-service: ${error.message}`, error.stack);
+      throw new InternalServerErrorException("Failed to get subscription status for auth-service");
+    }
+  }
+
   async updateStatus(id: string, status: SubscriptionStatus): Promise<SubscriptionDocument> {
     try {
       const updatedSubscription = await this.subscriptionModel.findByIdAndUpdate(

@@ -150,6 +150,42 @@ export class SubscriptionsController {
     return this.subscriptionsService.getStatus(userId);
   }
 
+  @Get("user/:userId/status/auth-service")
+  @ApiOperation({ summary: "Get subscription status in auth-service compatible format" })
+  @ApiParam({ name: "userId", type: "string", description: "User ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Subscription status retrieved in auth-service format",
+    schema: {
+      type: "object",
+      properties: {
+        hasSubscription: { type: "boolean" },
+        isActive: { type: "boolean" },
+        plan: { type: "string", enum: ["monthly", "yearly"], nullable: true },
+        status: { type: "string", enum: ["trial", "active", "past_due", "canceled", "unpaid"], nullable: true },
+        trialActive: { type: "boolean" },
+        daysRemaining: { type: "number" },
+        nextBillingDate: { type: "string", format: "date-time", nullable: true },
+        cancelAtPeriodEnd: { type: "boolean", nullable: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: "Subscription not found - returns default values." })
+  @ApiResponse({ status: 500, description: "Internal server error while retrieving subscription status." })
+  async getStatusForAuthService(@Param("userId") userId: string): Promise<{
+    hasSubscription: boolean;
+    isActive: boolean;
+    plan: "monthly" | "yearly" | null;
+    status: "trial" | "active" | "past_due" | "canceled" | "unpaid" | null;
+    trialActive: boolean;
+    daysRemaining: number;
+    nextBillingDate?: Date;
+    cancelAtPeriodEnd?: boolean;
+  }> {
+    this.logger.log(`Retrieving subscription status for auth-service for user: ${userId}`);
+    return this.subscriptionsService.getStatusForAuthService(userId);
+  }
+
   @Put(":id")
   @ApiOperation({ summary: "Update a subscription" })
   @ApiParam({ name: "id", type: "string", description: "Subscription ID" })
