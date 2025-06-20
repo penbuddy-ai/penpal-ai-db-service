@@ -57,17 +57,45 @@ services:
       retries: 3
       start_period: 40s
 
+  ai-service:
+    build:
+      context: ../../penpal-ai-asimov-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-asimov-service
+    volumes:
+      - ../../penpal-ai-asimov-service:/app
+      - /app/node_modules
+    ports:
+      - "3003:3003"
+    command: npm run start:dev
+    env_file:
+      - ./ai-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3003/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   payment-service:
     build:
-      context: ../../penpal-payment-service
+      context: ../../payment-service
       dockerfile: Dockerfile
       target: development
     container_name: penpal-ai-payment-service
     volumes:
-      - ../../penpal-payment-service:/app
+      - ../../payment-service:/app
       - /app/node_modules
     ports:
-      - "3003:3003"
+      - "3004:3004"
     command: npm run start:dev
     env_file:
       - ./payment-service/.env
@@ -79,7 +107,7 @@ services:
     networks:
       - penpal-network
     healthcheck:
-      test: [CMD, curl, -f, "http://localhost:3003/"]
+      test: [CMD, curl, -f, "http://localhost:3004/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
