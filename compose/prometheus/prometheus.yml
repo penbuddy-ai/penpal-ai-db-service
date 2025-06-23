@@ -1,0 +1,59 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+scrape_configs:
+  # Monitoring service metrics
+  - job_name: penpal-monitoring-service
+    static_configs:
+      - targets: ["monitoring-service:3005"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Auth service metrics (if they expose /metrics endpoint)
+  - job_name: penpal-auth-service
+    static_configs:
+      - targets: ["auth-service:3002"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # DB service metrics (if they expose /metrics endpoint)
+  - job_name: penpal-db-service
+    static_configs:
+      - targets: ["db-service:3001"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # AI service metrics (if they expose /metrics endpoint)
+  - job_name: penpal-ai-service
+    static_configs:
+      - targets: ["ai-service:3003"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Payment service metrics (if they expose /metrics endpoint)
+  - job_name: penpal-payment-service
+    static_configs:
+      - targets: ["payment-service:3004"]
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Prometheus itself
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+        # - alertmanager:9093
