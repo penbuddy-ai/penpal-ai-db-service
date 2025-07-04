@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -109,7 +110,13 @@ export class InternalUsersController {
     this.logger.log(
       `Lookup for OAuth user with provider: ${provider} and ID: ${providerId}`,
     );
-    return this.oauthUserService.findByOAuth(provider, providerId);
+    const user = await this.oauthUserService.findByOAuth(provider, providerId);
+
+    if (!user) {
+      throw new NotFoundException(`No user found with ${provider} profile ID: ${providerId}`);
+    }
+
+    return user;
   }
 
   @Get("email/:email")

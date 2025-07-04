@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
@@ -117,15 +117,11 @@ export class OAuthUserService {
     }
   }
 
-  async findByOAuth(provider: string, providerId: string): Promise<UserDocument> {
+  async findByOAuth(provider: string, providerId: string): Promise<UserDocument | null> {
     const user = await this.userModel.findOne({
       "oauthProfiles.provider": provider,
       "oauthProfiles.providerId": providerId,
     });
-
-    if (!user) {
-      throw new NotFoundException(`No user found with ${provider} profile ID: ${providerId}`);
-    }
 
     return user;
   }

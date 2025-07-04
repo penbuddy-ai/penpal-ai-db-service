@@ -2,6 +2,8 @@ import { ConflictException, Injectable, InternalServerErrorException, Logger, No
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
+import { NotificationServiceClient } from "../../common/services/notification-service.client";
+import { UserService } from "../users/users.service";
 import { CreateSubscriptionDto } from "./dto/create-subscription.dto";
 import { UpdateSubscriptionDto } from "./dto/update-subscription.dto";
 import { Subscription, SubscriptionDocument, SubscriptionPlan, SubscriptionStatus } from "./schemas/subscription.schema";
@@ -10,6 +12,8 @@ import { Subscription, SubscriptionDocument, SubscriptionPlan, SubscriptionStatu
 export class SubscriptionsService {
   constructor(
     @InjectModel(Subscription.name) private readonly subscriptionModel: Model<SubscriptionDocument>,
+    private readonly notificationService: NotificationServiceClient,
+    private readonly userService: UserService,
     private readonly logger: Logger,
   ) {}
 
@@ -22,7 +26,12 @@ export class SubscriptionsService {
       }
 
       const createdSubscription = new this.subscriptionModel(createSubscriptionDto);
-      return await createdSubscription.save();
+      const savedSubscription = await createdSubscription.save();
+
+      // Send subscription confirmation email in the background
+      this.sendSubscriptionConfirmationEmail(savedSubscription);
+
+      return savedSubscription;
     }
     catch (error) {
       if (error instanceof ConflictException) {
@@ -350,6 +359,83 @@ export class SubscriptionsService {
       }
       this.logger.error(`Error changing subscription plan: ${error.message}`, error.stack);
       throw new InternalServerErrorException("Failed to change subscription plan");
+    }
+  }
+
+  /**
+   * Send subscription confirmation email (non-blocking)
+   */
+  private async sendSubscriptionConfirmationEmail(subscription: SubscriptionDocument): Promise<void> {
+    try {
+      this.logger.log(`Sending subscription confirmation email for user: ${subscription.userId}`);
+
+      // Get user information from users module (we need to add this API call)
+      const userInfo = await this.getUserInfo(subscription.userId);
+      if (!userInfo) {
+        this.logger.warn(`Cannot send subscription email: user info not found for user ${subscription.userId}`);
+        return;
+      }
+
+      // Calculate amount based on plan
+      const amount = subscription.plan === SubscriptionPlan.MONTHLY
+        ? subscription.monthlyPrice
+        : subscription.yearlyPrice;
+
+      // Send the email (only for trial and active subscriptions)
+      const emailStatus = subscription.status === SubscriptionStatus.TRIAL ? "trial" as const : "active" as const;
+
+      await this.notificationService.sendSubscriptionConfirmationEmail({
+        email: userInfo.email,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        plan: subscription.plan,
+        status: emailStatus,
+        trialEnd: subscription.trialEnd,
+        nextBillingDate: subscription.nextBillingDate,
+        amount,
+        currency: subscription.currency,
+        userId: subscription.userId,
+      });
+
+      this.logger.log(`Subscription confirmation email sent successfully for user: ${subscription.userId}`);
+    }
+    catch (error) {
+      // Log error but don't throw - we don't want email failures to break subscription creation
+      this.logger.error(
+        `Failed to send subscription confirmation email for user ${subscription.userId}: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  /**
+   * Get user information for email sending
+   */
+  private async getUserInfo(userId: string): Promise<{ email: string; firstName: string; lastName: string } | null> {
+    try {
+      this.logger.log(`Fetching user info for userId: ${userId}`);
+
+      const user = await this.userService.findOne(userId);
+
+      if (!user) {
+        this.logger.warn(`User not found for userId: ${userId}`);
+        return null;
+      }
+
+      if (!user.email) {
+        this.logger.warn(`User ${userId} has no email address`);
+        return null;
+      }
+
+      return {
+        email: user.email,
+        firstName: user.firstName || "Utilisateur",
+        lastName: user.lastName || "Penpal AI",
+      };
+    }
+    catch (error) {
+      this.logger.error(`Error fetching user info for ${userId}: ${error.message}`, error.stack);
+      return null;
     }
   }
 }
