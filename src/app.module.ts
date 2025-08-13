@@ -64,7 +64,7 @@ import { UsersModule } from "./modules/users/users.module";
           retryReads: true,
           w: "majority",
           authSource: "admin",
-          ssl: configService.get<string>("NODE_ENV") === "production",
+          ssl: false,
         };
 
         return options;
