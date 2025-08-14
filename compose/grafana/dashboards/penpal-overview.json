@@ -1,7 +1,7 @@
 {
-  "dashboard": {
-    "id": null,
-    "title": "Penpal AI - Services Overview",
+  "id": null,
+  "uid": "penpal-overview",
+  "title": "Penpal AI - Services Overview",
     "tags": ["penpal", "monitoring", "overview"],
     "style": "dark",
     "timezone": "browser",
@@ -184,8 +184,7 @@
           "textMode": "value"
         }
       }
-    ]
-  },
+    ],
   "folderId": null,
   "overwrite": true
 }

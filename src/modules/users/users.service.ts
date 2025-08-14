@@ -4,15 +4,15 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-} from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import * as argon2 from "argon2";
-import { Model } from "mongoose";
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as argon2 from 'argon2';
+import { Model } from 'mongoose';
 
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserRole, UserRoleDocument } from "./schemas/user-role.schema";
-import { User, UserDocument } from "./schemas/user.schema";
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRole, UserRoleDocument } from './schemas/user-role.schema';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -27,18 +27,17 @@ export class UserService {
     try {
       const existingUser = await this.findByEmail(createUserDto.email);
       if (existingUser) {
-        throw new ConflictException("User with this email already exists");
+        throw new ConflictException('User with this email already exists');
       }
 
       const createdUser = new this.userModel(createUserDto);
       return await createdUser.save();
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
       this.logger.error(`Error creating user: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to create user");
+      throw new InternalServerErrorException('Failed to create user');
     }
   }
 
@@ -55,13 +54,12 @@ export class UserService {
       }
 
       return await query.exec();
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error(
         `Error finding all users: ${error.message}`,
         error.stack,
       );
-      throw new InternalServerErrorException("Failed to retrieve users");
+      throw new InternalServerErrorException('Failed to retrieve users');
     }
   }
 
@@ -72,26 +70,24 @@ export class UserService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
       return user;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       this.logger.error(`Error finding user: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to retrieve user");
+      throw new InternalServerErrorException('Failed to retrieve user');
     }
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     try {
       return await this.userModel.findOne({ email }).exec();
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error(
         `Error finding user by email: ${error.message}`,
         error.stack,
       );
-      throw new InternalServerErrorException("Failed to find user by email");
+      throw new InternalServerErrorException('Failed to find user by email');
     }
   }
 
@@ -111,13 +107,12 @@ export class UserService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
       return updatedUser;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       this.logger.error(`Error updating user: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to update user");
+      throw new InternalServerErrorException('Failed to update user');
     }
   }
 
@@ -128,13 +123,12 @@ export class UserService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
       return deletedUser;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       this.logger.error(`Error removing user: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to delete user");
+      throw new InternalServerErrorException('Failed to delete user');
     }
   }
 
@@ -144,7 +138,7 @@ export class UserService {
         .findOne({ userId, roleId })
         .exec();
       if (existingUserRole) {
-        throw new ConflictException("User already has this role");
+        throw new ConflictException('User already has this role');
       }
 
       const userRole = new this.userRoleModel({
@@ -153,13 +147,12 @@ export class UserService {
         assignedAt: new Date(),
       });
       return await userRole.save();
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof ConflictException) {
         throw error;
       }
       this.logger.error(`Error assigning role: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to assign role to user");
+      throw new InternalServerErrorException('Failed to assign role to user');
     }
   }
 
@@ -167,15 +160,14 @@ export class UserService {
     try {
       return await this.userRoleModel
         .find({ userId })
-        .populate("roleId")
+        .populate('roleId')
         .exec();
-    }
-    catch (error) {
+    } catch (error) {
       this.logger.error(
         `Error getting user roles: ${error.message}`,
         error.stack,
       );
-      throw new InternalServerErrorException("Failed to retrieve user roles");
+      throw new InternalServerErrorException('Failed to retrieve user roles');
     }
   }
 
@@ -185,15 +177,14 @@ export class UserService {
         .deleteOne({ userId, roleId })
         .exec();
       if (result.deletedCount === 0) {
-        throw new NotFoundException("User role not found");
+        throw new NotFoundException('User role not found');
       }
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
       this.logger.error(`Error removing role: ${error.message}`, error.stack);
-      throw new InternalServerErrorException("Failed to remove role from user");
+      throw new InternalServerErrorException('Failed to remove role from user');
     }
   }
 
@@ -226,8 +217,7 @@ export class UserService {
         `Updated subscription for user ${userId}: ${subscriptionData.plan} (${subscriptionData.status})`,
       );
       return updatedUser;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -236,7 +226,7 @@ export class UserService {
         error.stack,
       );
       throw new InternalServerErrorException(
-        "Failed to update user subscription",
+        'Failed to update user subscription',
       );
     }
   }
@@ -281,8 +271,7 @@ export class UserService {
       this.logger.log(`Onboarding progress updated for user: ${id}`);
 
       return user;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -291,7 +280,7 @@ export class UserService {
         error.stack,
       );
       throw new InternalServerErrorException(
-        "Failed to update onboarding progress",
+        'Failed to update onboarding progress',
       );
     }
   }
@@ -325,8 +314,7 @@ export class UserService {
       this.logger.log(`Onboarding completed for user: ${id}`);
 
       return user;
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -334,7 +322,7 @@ export class UserService {
         `Error completing onboarding for user ${id}`,
         error.stack,
       );
-      throw new InternalServerErrorException("Failed to complete onboarding");
+      throw new InternalServerErrorException('Failed to complete onboarding');
     }
   }
 
@@ -360,10 +348,9 @@ export class UserService {
 
       return {
         needsOnboarding,
-        currentStep: needsOnboarding ? "preferred-name" : undefined,
+        currentStep: needsOnboarding ? 'preferred-name' : undefined,
       };
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -372,8 +359,118 @@ export class UserService {
         error.stack,
       );
       throw new InternalServerErrorException(
-        "Failed to check onboarding status",
+        'Failed to check onboarding status',
       );
     }
+  }
+
+  /**
+   * Get user metrics for monitoring
+   */
+  async getUserMetrics(): Promise<{
+    activeUsers: number;
+    totalUsers: number;
+    usersByLanguage: Record<string, number>;
+    averageUserLevel: Record<string, number>;
+  }> {
+    try {
+      this.logger.log('Calculating user metrics for monitoring');
+
+      // Calculate total users
+      const totalUsers = await this.userModel.countDocuments({}).exec();
+
+      // Calculate active users (users active in the last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const activeUsers = await this.userModel
+        .countDocuments({
+          lastActive: { $gte: thirtyDaysAgo },
+        })
+        .exec();
+
+      // Get users by language with proficiency levels
+      const users = await this.userModel
+        .find({}, { learningLanguages: 1, proficiencyLevels: 1 })
+        .populate('learningLanguages', 'name code')
+        .exec();
+
+      const usersByLanguage: Record<string, number> = {};
+      const languageLevels: Record<string, number[]> = {};
+
+      // Process each user
+      for (const user of users) {
+        if (user.learningLanguages && Array.isArray(user.learningLanguages)) {
+          for (const language of user.learningLanguages) {
+            const languageName =
+              (language as any).name || (language as any).code || 'unknown';
+
+            // Count users by language
+            usersByLanguage[languageName] =
+              (usersByLanguage[languageName] || 0) + 1;
+
+            // Collect proficiency levels for average calculation
+            if (
+              user.proficiencyLevels &&
+              user.proficiencyLevels[languageName]
+            ) {
+              const levelString = user.proficiencyLevels[languageName];
+              const levelNumber = this.convertLevelToNumber(levelString);
+
+              if (!languageLevels[languageName]) {
+                languageLevels[languageName] = [];
+              }
+              languageLevels[languageName].push(levelNumber);
+            }
+          }
+        }
+      }
+
+      // Calculate average levels
+      const averageUserLevel: Record<string, number> = {};
+      for (const [language, levels] of Object.entries(languageLevels)) {
+        if (levels.length > 0) {
+          const sum = levels.reduce((acc, level) => acc + level, 0);
+          averageUserLevel[language] =
+            Math.round((sum / levels.length) * 100) / 100; // Round to 2 decimals
+        }
+      }
+
+      this.logger.log(
+        `User metrics calculated: ${totalUsers} total, ${activeUsers} active, ${Object.keys(usersByLanguage).length} languages`,
+      );
+
+      return {
+        activeUsers,
+        totalUsers,
+        usersByLanguage,
+        averageUserLevel,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error calculating user metrics: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to calculate user metrics',
+      );
+    }
+  }
+
+  /**
+   * Convert proficiency level string to number for calculations
+   */
+  private convertLevelToNumber(level: string): number {
+    const levelMap: Record<string, number> = {
+      beginner: 1,
+      elementary: 2,
+      intermediate: 3,
+      'upper-intermediate': 4,
+      advanced: 5,
+      proficient: 6,
+      native: 7,
+    };
+
+    return levelMap[level.toLowerCase()] || 1; // Default to beginner if unknown
   }
 }
