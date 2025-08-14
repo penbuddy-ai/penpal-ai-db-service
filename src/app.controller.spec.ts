@@ -1,24 +1,27 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { ConfigService } from "@nestjs/config";
+import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
-describe("appController", () => {
+describe('appController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService, { provide: ConfigService, useValue: { get: jest.fn() } }],
+      providers: [
+        AppService,
+        { provide: ConfigService, useValue: { get: jest.fn() } },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
-  describe("root", () => {
-    it("should return \"Hello World!\"", () => {
-    expect(appController).toBeDefined();
+  describe('root', () => {
+    it('should return "Hello World!"', () => {
+      expect(appController).toBeDefined();
     });
   });
 });

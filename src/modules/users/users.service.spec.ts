@@ -1,11 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Logger } from '@nestjs/common';
+import { Logger, ConflictException, NotFoundException } from '@nestjs/common';
 import { UserService } from './users.service';
+
+jest.mock('argon2', () => ({
+  __esModule: true,
+  default: {},
+  hash: jest.fn().mockResolvedValue('hashedpw'),
+}));
 
 describe('UserService', () => {
   let service: UserService;
+  let userModel: any;
+  let userRoleModel: any;
 
   beforeEach(async () => {
     const mockModel = () => ({
@@ -33,6 +41,8 @@ describe('UserService', () => {
     }).compile();
 
     service = module.get<UserService>(UserService);
+    userModel = module.get(getModelToken('User')) as any;
+    userRoleModel = module.get(getModelToken('UserRole')) as any;
   });
 
   it('should be defined', () => {
@@ -53,6 +63,35 @@ describe('UserService', () => {
       expect(res).toHaveProperty('totalUsers');
     }
   });
+
+  it('findOne throws NotFoundException when not found', async () => {
+    userModel.exec.mockResolvedValueOnce(null);
+    await expect(service.findOne('nope')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('update hashes password and returns updated user', async () => {
+    userModel.exec.mockResolvedValueOnce({ id: 'u1' }); // for findByIdAndUpdate
+    const res = await service.update('u1', { password: 'clear' } as any);
+    expect(res).toHaveProperty('id', 'u1');
+  });
+
+  it('remove throws NotFoundException when user not found', async () => {
+    userModel.exec.mockResolvedValueOnce(null);
+    await expect(service.remove('x')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('assignRole throws ConflictException when already exists', async () => {
+    userRoleModel.exec.mockResolvedValueOnce({ id: 'r1' });
+    await expect(service.assignRole('u', 'r')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+  });
+
+  it('getOnboardingStatus returns needsOnboarding based on user doc', async () => {
+    userModel.exec.mockResolvedValueOnce({ onboardingCompleted: false });
+    const res = await service.getOnboardingStatus('u1');
+    expect(res.needsOnboarding).toBe(true);
+  });
 });
-
-
