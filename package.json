@@ -96,10 +96,17 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "modules/users/dto/**/*.(t|j)s",
-      "modules/users/schemas/**/*.(t|j)s",
-      "modules/users/users.controller.ts",
-      "modules/users/users.service.ts"
+      "**/*.(t|j)s",
+      "!**/*.spec.ts",
+      "!**/*.e2e-spec.ts",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/coverage/**",
+      "!src/main.ts",
+      "!src/**/*.d.ts",
+      "!src/**/dto/**",
+      "!src/**/schemas/**",
+      "!src/common/seeds/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
