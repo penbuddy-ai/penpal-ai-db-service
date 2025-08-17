@@ -1,0 +1,105 @@
+---
+config:
+  theme: dark
+---
+erDiagram
+    %% AUTHENTIFICATION ET UTILISATEURS
+    User {
+        ObjectId _id PK
+        String email
+        String hashedPassword
+        String firstName
+        String lastName
+        String profilePicture
+        Date createdAt
+        Date updatedAt
+        Boolean isActive
+        Boolean isVerified
+        ObjectId[] roleIds FK
+        Object preferences
+        ObjectId[] conversations FK
+    }
+
+    Role {
+        ObjectId _id PK
+        String name
+        String description
+        Object permissions
+        Boolean isSystem
+    }
+
+    UserRole {
+        ObjectId _id PK
+        ObjectId userId FK
+        ObjectId roleId FK
+        Date assignedAt
+    }
+
+    %% IA ET CONVERSATIONS
+    AICharacter {
+        ObjectId _id PK
+        String name
+        String avatar
+        String[] languagesSpoken
+        String personality
+        String backstory
+        Object conversationStyle
+        Boolean isActive
+    }
+
+    Conversation {
+        ObjectId _id PK
+        ObjectId userId FK
+        ObjectId aiCharacterId FK
+        ObjectId languageId FK
+        String title
+        Date createdAt
+        Date lastMessageAt
+        Number messageCount
+        String status
+    }
+
+    Message {
+        ObjectId _id PK
+        ObjectId conversationId FK
+        String sender
+        String content
+        Date timestamp
+        Boolean isRead
+        Object corrections
+    }
+
+    %% LANGUES ET PROGRESSION BASIQUE
+    Language {
+        ObjectId _id PK
+        String code
+        String name
+        String nativeName
+        String flag
+        Number difficulty
+        Boolean isActive
+    }
+
+    UserLanguage {
+        ObjectId _id PK
+        ObjectId userId FK
+        ObjectId languageId FK
+        String proficiency
+        Date startedLearning
+        Number experiencePoints
+        Number level
+    }
+
+    %% RELATIONS
+    User ||--o{ UserRole : "possède"
+    User ||--o{ Conversation : "participe"
+    User ||--o{ UserLanguage : "apprend"
+    
+    Role ||--o{ UserRole : "attribué à"
+    
+    Language ||--o{ UserLanguage : "étudié comme"
+    Language ||--o{ Conversation : "utilisé dans"
+    
+    AICharacter ||--o{ Conversation : "participe"
+    
+    Conversation ||--o{ Message : "contient"

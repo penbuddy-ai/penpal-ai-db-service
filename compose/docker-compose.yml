@@ -1,0 +1,336 @@
+version: "3.8"
+
+services:
+  db-service:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-db-service
+    volumes:
+      - ../:/app
+      - /app/node_modules
+    ports:
+      - "3001:3001"
+    command: npm run start:dev
+    env_file:
+      - ./db-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3001/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  auth-service:
+    build:
+      context: ../../penpal-ai-auth-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-auth-service
+    volumes:
+      - ../../penpal-ai-auth-service:/app
+      - /app/node_modules
+    ports:
+      - "3002:3002"
+    command: npm run start:dev
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3002/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  ai-service:
+    build:
+      context: ../../penpal-ai-asimov-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-asimov-service
+    volumes:
+      - ../../penpal-ai-asimov-service:/app
+      - /app/node_modules
+    ports:
+      - "3003:3003"
+    command: npm run start:dev
+    env_file:
+      - ./ai-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3003/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  payment-service:
+    build:
+      context: ../../payment-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-payment-service
+    volumes:
+      - ../../payment-service:/app
+      - /app/node_modules
+    ports:
+      - "3004:3004"
+    command: npm run start:dev
+    env_file:
+      - ./payment-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3004/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # monitoring-service:
+  #   build:
+  #     context: ../../penpal-ai-monitoring-service
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   container_name: penpal-ai-monitoring-service
+  #   volumes:
+  #     - ../../penpal-ai-monitoring-service:/app
+  #     - /app/node_modules
+  #   ports:
+  #     - "3005:3005"
+  #   command: npm run start:dev
+  #   env_file:
+  #     - ./monitoring-service/.env
+  #   depends_on:
+  #     mongodb:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - penpal-network
+  #   healthcheck:
+  #     test: [CMD, curl, -f, "http://localhost:3005/api/v1/status"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: penpal-prometheus
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+  #   command:
+  #     - --config.file=/etc/prometheus/prometheus.yml
+  #     - --storage.tsdb.path=/prometheus
+  #     - --web.console.libraries=/etc/prometheus/console_libraries
+  #     - --web.console.templates=/etc/prometheus/consoles
+  #     - --storage.tsdb.retention.time=200h
+  #     - --web.enable-lifecycle
+  #   networks:
+  #     - penpal-network
+  #   depends_on:
+  #     - monitoring-service
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: penpal-grafana
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3006:3000"
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #     - ./grafana/provisioning:/etc/grafana/provisioning
+  #     - ./grafana/dashboards:/var/lib/grafana/dashboards
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin123
+  #     - GF_USERS_ALLOW_SIGN_UP=false
+  #   networks:
+  #     - penpal-network
+  #   depends_on:
+  #     - prometheus
+
+  notify-service:
+    build:
+      context: ../../penpal-ai-notify-service
+      dockerfile: Dockerfile
+      target: development
+    container_name: penpal-ai-notify-service
+    volumes:
+      - ../../penpal-ai-notify-service:/app
+      - /app/node_modules
+    ports:
+      - "3007:3007"
+    command: npm run start:dev
+    env_file:
+      - ./notify-service/.env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, curl, -f, "http://localhost:3007/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # frontend-service:
+  #   build:
+  #     context: ../../penpal-frontend
+  #     dockerfile: Dockerfile
+  #     target: development
+  #     args:
+  #       - NODE_ENV=development
+  #   container_name: penpal-ai-frontend
+  #   volumes:
+  #     - ../../penpal-frontend:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - NEXT_TELEMETRY_DISABLED=1
+  #     - PORT=3000
+  #   env_file:
+  #     - ./frontend-service/.env
+  #   depends_on:
+  #     db-service:
+  #       condition: service_healthy
+  #     auth-service:
+  #       condition: service_healthy
+  #   networks:
+  #     - penpal-network
+  #   healthcheck:
+  #     test: [CMD, wget, --no-verbose, --tries=1, --spider, http://localhost:3000/api/health]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
+  #   command: npm run dev
+
+  mongodb:
+    image: mongo:6.0
+    container_name: penpal-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./mongodb/init:/docker-entrypoint-initdb.d
+    networks:
+      - penpal-network
+    environment:
+      - MONGO_INITDB_DATABASE=penpal-ai
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_USERNAME=penpal_user
+      - MONGO_INITDB_PASSWORD=penpal_password
+    command: [--auth, --bind_ip_all]
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin -u admin -p admin123 --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: penpal-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin123
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_OPTIONS_EDITORTHEME=ambiance
+      - ME_CONFIG_SITE_PORT=8081
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - penpal-network
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://admin:admin123@localhost:8081/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: penpal-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --requirepass redis123
+    networks:
+      - penpal-network
+    healthcheck:
+      test: [CMD, redis-cli, -a, redis123, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  penpal-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

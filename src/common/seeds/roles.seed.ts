@@ -16,6 +16,7 @@ export const rolesSeed = [
     description: "Standard user role",
     permissions: {
       users: ["read", "update"],
+      roles: ["read"],
       conversations: ["create", "read", "update", "delete", "list"],
       languages: ["read", "list"],
       aiCharacters: ["read", "list"],
@@ -27,6 +28,7 @@ export const rolesSeed = [
     description: "Content moderator role",
     permissions: {
       users: ["read", "list"],
+      roles: ["read"],
       conversations: ["read", "update", "list"],
       languages: ["read", "list"],
       aiCharacters: ["read", "list"],

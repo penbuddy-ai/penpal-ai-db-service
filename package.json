@@ -14,6 +14,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "lint-staged": "lint-staged",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -23,13 +24,30 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@nestjs/axios": "^4.0.0",
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/jwt": "^11.0.0",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.1.2",
+    "@nestjs/throttler": "^6.4.0",
+    "@types/cache-manager": "^5.0.0",
+    "@types/compression": "^1.7.5",
+    "@types/express-rate-limit": "^6.0.2",
+    "@types/helmet": "^4.0.0",
+    "argon2": "^0.43.0",
+    "axios": "^1.10.0",
+    "bcrypt": "^5.1.1",
+    "cache-manager": "^6.4.2",
+    "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "compression": "^1.8.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
     "lint-staged": "^12.3.2",
     "mongoose": "^8.13.2",
     "reflect-metadata": "^0.2.2",
@@ -44,9 +62,10 @@
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.7",
+    "@types/node": "^22.14.1",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.0.1",
@@ -83,6 +102,6 @@
     "testEnvironment": "node"
   },
   "lint-staged": {
-    "*": "pnpm lint"
+    "*": "npm run lint"
   }
 }

@@ -1,144 +1,232 @@
-# Penpal AI - Database Service
+# Penpal AI Database Service
 
-This service handles database operations for the Penpal AI application, a conversational AI language learning platform.
+This is the database service for the Penpal AI application, built with NestJS, MongoDB, and Redis.
 
-## Description
+## Features
 
-The database service is responsible for storing and retrieving data related to:
+- User management with roles and permissions
+- Language learning tracking
+- AI character management
+- Conversation and message handling
+- Secure authentication and authorization
+- Redis caching for optimized performance
+- API documentation with Swagger
+- Database seeding for development
 
-- Users and authentication
-- AI character profiles
-- Conversations between users and AI characters
-- Language learning progress
-- Available languages
+## Prerequisites
 
-## Tech Stack
+- Node.js (v20 or higher)
+- MongoDB (v6.0 or higher)
+- Redis (v7.0 or higher)
+- npm or yarn
 
-- **NestJS**: Backend framework
-- **MongoDB**: NoSQL database
-- **Mongoose**: ODM (Object Data Modeling)
-- **TypeScript**: Programming language
+## Installation
 
-## Getting Started
+### Local Development
 
-### Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (local or MongoDB Atlas)
-
-### Installation
-
-1. Clone the repository
+1. Clone the repository:
 
 ```bash
-git clone git@github.com:your-username/penpal-ai-db-service.git
+git clone https://github.com/your-username/penpal-ai-db-service.git
 cd penpal-ai-db-service
 ```
 
-2. Install dependencies
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Set up environment variables
+3. Create a `.env` file based on `.env.example`:
 
 ```bash
 cp .env.example .env
-# Edit .env file with your configuration
 ```
 
-4. Start the development server
+Edit the `.env` file to match your environment.
+
+4. Run the application in development mode:
 
 ```bash
 npm run start:dev
 ```
 
-### Database Seeding
+### Using Docker Compose
 
-To populate the database with initial data:
+1. Clone the repository and navigate to the compose folder:
 
 ```bash
-npm run seed
+git clone https://github.com/your-username/penpal-ai-db-service.git
+cd penpal-ai-db-service/compose
 ```
 
-This will create:
+2. Start the services with Docker Compose:
 
-- Default languages
-- System roles
-- Sample AI characters
+```bash
+docker-compose up -d
+```
+
+## Architecture
+
+The application is built with NestJS and uses:
+
+- **MongoDB** as the primary database
+- **Redis** as a caching system
+- **JWT** for authentication
+- **Swagger** for API documentation
+
+### Data Model
+
+![Data Model](MVP-penpal-ai-diagram.png)
+
+- **Users**: User management, profiles, and preferences
+- **Roles**: Role-based access control
+- **Languages**: Languages available for learning
+- **AI Characters**: AI personalities to converse with
+- **Conversations**: Exchanges between users and AI
+- **Messages**: Conversation content
 
 ## API Endpoints
 
-### Languages
+The API is accessible at `http://localhost:3001/api/v1` and the Swagger documentation at `http://localhost:3001/docs`.
 
-- `GET /languages` - Get all languages
-- `GET /languages/:code` - Get language by code
-- `POST /languages` - Create new language
-- `PUT /languages/:code` - Update language
-- `DELETE /languages/:code` - Delete language
+### Main endpoints
 
-### Users
+#### Users
 
-- `GET /users` - Get all users
-- `GET /users/:id` - Get user by ID
-- `POST /users` - Create new user
-- `PUT /users/:id` - Update user
-- `DELETE /users/:id` - Delete user
+- `GET /users` - List all users
+- `GET /users/:id` - Get user details
+- `POST /users` - Create a user
+- `PUT /users/:id` - Update a user
+- `DELETE /users/:id` - Delete a user
 
-### Conversations
+#### Languages
 
-- `GET /conversations` - Get all conversations
-- `GET /conversations/:id` - Get conversation by ID
-- `POST /conversations` - Create new conversation
-- `PUT /conversations/:id` - Update conversation
-- `DELETE /conversations/:id` - Delete conversation
+- `GET /languages` - List all languages
+- `GET /languages/:code` - Get language details
+- `POST /languages` - Create a language
+- `PUT /languages/:code` - Update a language
+- `DELETE /languages/:code` - Delete a language
 
-## Database Schema
+#### Roles
 
-The database follows this schema:
+- `GET /roles` - List all roles
+- `GET /roles/:name` - Get role details
+- `POST /roles` - Create a role
+- `PUT /roles/:name` - Update a role
+- `DELETE /roles/:name` - Delete a role
 
-### Users Collection
+#### AI Characters
 
-Stores user information and preferences.
+- `GET /ai-characters` - List all AI characters
+- `GET /ai-characters/:id` - Get AI character details
+- `POST /ai-characters` - Create an AI character
+- `PUT /ai-characters/:id` - Update an AI character
+- `DELETE /ai-characters/:id` - Delete an AI character
 
-### Roles Collection
+#### Conversations
 
-Defines user roles and permissions.
+- `GET /conversations` - List all conversations with pagination and filtering
+- `GET /conversations/:id` - Get conversation details
+- `GET /conversations/user/:userId` - Get all conversations for a specific user
+- `POST /conversations` - Create a new conversation
+- `PATCH /conversations/:id` - Update a conversation
+- `DELETE /conversations/:id` - Soft delete a conversation (sets status to deleted)
+- `DELETE /conversations/:id/hard` - Hard delete a conversation (removes from database)
 
-### AICharacters Collection
+#### Messages
 
-Contains AI language partner profiles.
+- `GET /messages?conversationId=:id` - List all messages for a conversation with pagination and filtering
+- `GET /messages/:id` - Get message details
+- `POST /messages` - Create a new message
+- `PATCH /messages/:id` - Update a message
+- `PATCH /messages/:id/read` - Mark a message as read
+- `PATCH /messages/:id/corrections` - Add corrections to a message
+- `DELETE /messages/:id` - Delete a message
+- `DELETE /messages/conversation/:conversationId` - Delete all messages for a conversation
 
-### Conversations Collection
+## Redis Caching System
 
-Stores conversation metadata.
+The service uses Redis as a caching system to optimize the performance of frequently accessed requests.
 
-### Messages Collection
+### Cache Configuration
 
-Stores individual messages within conversations.
+Redis caching is configured in the `src/modules/cache/cache.module.ts` file.
 
-### Languages Collection
+The main configuration options are:
 
-Available languages for learning.
+- `REDIS_HOST`: Redis host (default: localhost or redis in Docker)
+- `REDIS_PORT`: Redis port (default: 6379)
+- `REDIS_PASSWORD`: Redis password
+- `REDIS_TTL`: Cache time-to-live in seconds (default: 3600)
 
-### UserLanguages Collection
+### Cached Endpoints
 
-Tracks user progress in each language.
+The following routes use Redis caching:
 
-## Running Tests
+- `GET /languages` - List of languages (TTL: 3600s)
+- `GET /languages/:code` - Language details (TTL: 3600s)
+- `GET /users` - List of users (TTL: 3600s)
+- `GET /users/:id` - User details (TTL: 3600s)
+- `GET /roles` - List of roles (TTL: 3600s)
+- `GET /roles/:name` - Role details (TTL: 3600s)
+- `GET /ai-characters` - List of AI characters (TTL: 3600s)
+- `GET /ai-characters/:id` - AI character details (TTL: 3600s)
+- `GET /conversations` - List of conversations (TTL: 3600s)
+- `GET /conversations/:id` - Conversation details (TTL: 3600s)
+- `GET /conversations/user/:userId` - List of conversations for a user (TTL: 3600s)
+- `GET /messages?conversationId=:id` - List of messages for a conversation (TTL: 3600s)
+- `GET /messages/:id` - Message details (TTL: 3600s)
 
-```bash
-# Unit tests
-npm run test
+## Environment Variables
 
-# E2E tests
-npm run test:e2e
+### Database
 
-# Test coverage
-npm run test:cov
-```
+- `MONGODB_URI`: MongoDB connection URI
+- `MONGODB_USER`: MongoDB username
+- `MONGODB_PASSWORD`: MongoDB password
+
+### Redis Cache
+
+- `REDIS_HOST`: Redis host
+- `REDIS_PORT`: Redis port
+- `REDIS_PASSWORD`: Redis password
+- `REDIS_TTL`: Cache time-to-live (seconds)
+
+### JWT
+
+- `JWT_SECRET`: Secret key for JWT
+- `JWT_EXPIRATION`: Token expiration period
+
+### API
+
+- `API_PREFIX`: API prefix (default: /api)
+- `API_VERSION`: API version (default: v1)
+- `PORT`: Server port
+
+### Security
+
+- `PASSWORD_SALT_ROUNDS`: Password hashing rounds
+- `MAX_LOGIN_ATTEMPTS`: Maximum login attempts
+- `LOGIN_LOCKOUT_MINUTES`: Lockout duration after failed attempts
+
+### Miscellaneous
+
+- `LOG_LEVEL`: Logging level (debug, info, warn, error)
+- `NODE_ENV`: Environment (development, production, test)
+- `CORS_ORIGIN`: Allowed origins for CORS
+
+## Logging and Monitoring
+
+In development mode, the service displays detailed logs for each request including:
+
+- Method and URL
+- Response status
+- Response time
+- Request and response body (in debug mode)
+
+To adjust the log detail level, modify the `LOG_LEVEL` variable in the `.env` file.
 
 ## License
 
-This project is licensed under the MIT License.
+MIT

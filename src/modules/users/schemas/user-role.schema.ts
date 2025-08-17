@@ -6,7 +6,7 @@ import { User } from "./user.schema";
 
 export type UserRoleDocument = UserRole & Document;
 
-@Schema({ timestamps: true })
+@Schema()
 export class UserRole {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: "User", required: true })
   userId: User;
@@ -19,3 +19,6 @@ export class UserRole {
 }
 
 export const UserRoleSchema = SchemaFactory.createForClass(UserRole);
+
+// Indexes
+UserRoleSchema.index({ userId: 1, roleId: 1 }, { unique: true });
