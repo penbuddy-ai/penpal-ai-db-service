@@ -21,7 +21,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.jest/bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/common/seeds/seed.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release:patch": "npm version patch && git push origin $(git describe --tags --abbrev=0)",
+    "release:minor": "npm version minor && git push origin $(git describe --tags --abbrev=0)",
+    "release:major": "npm version major && git push origin $(git describe --tags --abbrev=0)"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.0",
@@ -96,7 +99,17 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/*.spec.ts",
+      "!**/*.e2e-spec.ts",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/coverage/**",
+      "!src/main.ts",
+      "!src/**/*.d.ts",
+      "!src/**/dto/**",
+      "!src/**/schemas/**",
+      "!src/common/seeds/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

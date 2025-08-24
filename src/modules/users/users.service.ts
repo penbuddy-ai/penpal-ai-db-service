@@ -376,4 +376,115 @@ export class UserService {
       );
     }
   }
+
+  /**
+   * Get user metrics for monitoring
+   */
+  async getUserMetrics(): Promise<{
+    activeUsers: number;
+    totalUsers: number;
+    usersByLanguage: Record<string, number>;
+    averageUserLevel: Record<string, number>;
+  }> {
+    try {
+      this.logger.log("Calculating user metrics for monitoring");
+
+      // Calculate total users
+      const totalUsers = await this.userModel.countDocuments({}).exec();
+
+      // Calculate active users (users active in the last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const activeUsers = await this.userModel
+        .countDocuments({
+          lastActive: { $gte: thirtyDaysAgo },
+        })
+        .exec();
+
+      // Get users by language with proficiency levels
+      const users = await this.userModel
+        .find({}, { learningLanguages: 1, proficiencyLevels: 1 })
+        .populate("learningLanguages", "name code")
+        .exec();
+
+      const usersByLanguage: Record<string, number> = {};
+      const languageLevels: Record<string, number[]> = {};
+
+      // Process each user
+      for (const user of users) {
+        if (user.learningLanguages && Array.isArray(user.learningLanguages)) {
+          for (const language of user.learningLanguages) {
+            const languageName
+              = (language as any).name || (language as any).code || "unknown";
+
+            // Count users by language
+            usersByLanguage[languageName]
+              = (usersByLanguage[languageName] || 0) + 1;
+
+            // Collect proficiency levels for average calculation
+            if (
+              user.proficiencyLevels
+              && user.proficiencyLevels[languageName]
+            ) {
+              const levelString = user.proficiencyLevels[languageName];
+              const levelNumber = this.convertLevelToNumber(levelString);
+
+              if (!languageLevels[languageName]) {
+                languageLevels[languageName] = [];
+              }
+              languageLevels[languageName].push(levelNumber);
+            }
+          }
+        }
+      }
+
+      // Calculate average levels
+      const averageUserLevel: Record<string, number> = {};
+      for (const [language, levels] of Object.entries(languageLevels)) {
+        if (levels.length > 0) {
+          const sum = levels.reduce((acc, level) => acc + level, 0);
+          averageUserLevel[language]
+            = Math.round((sum / levels.length) * 100) / 100; // Round to 2 decimals
+        }
+      }
+
+      this.logger.log(
+        `User metrics calculated: ${totalUsers} total, ${activeUsers} active, ${Object.keys(usersByLanguage).length} languages`,
+      );
+
+      return {
+        activeUsers,
+        totalUsers,
+        usersByLanguage,
+        averageUserLevel,
+      };
+    }
+    catch (error) {
+      this.logger.error(
+        `Error calculating user metrics: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        "Failed to calculate user metrics",
+      );
+    }
+  }
+
+  /**
+   * Convert proficiency level string to number for calculations
+   */
+  private convertLevelToNumber(level: string): number {
+    const levelMap: Record<string, number> = {
+      "beginner": 1,
+      "elementary": 2,
+      "intermediate": 3,
+      "upper-intermediate": 4,
+      "advanced": 5,
+      "proficient": 6,
+      "native": 7,
+    };
+
+    return levelMap[level.toLowerCase()] || 1; // Default to beginner if unknown
+  }
 }

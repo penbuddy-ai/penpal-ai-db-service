@@ -11,39 +11,39 @@ scrape_configs:
   - job_name: penpal-monitoring-service
     static_configs:
       - targets: ["monitoring-service:3005"]
-    metrics_path: /metrics
+    metrics_path: /api/v1/metrics
     scrape_interval: 30s
     scrape_timeout: 10s
 
-  # Auth service metrics (if they expose /metrics endpoint)
+  # Auth service metrics (if they expose /api/v1/metrics endpoint)
   - job_name: penpal-auth-service
     static_configs:
       - targets: ["auth-service:3002"]
-    metrics_path: /metrics
+    metrics_path: /api/v1/metrics
     scrape_interval: 30s
     scrape_timeout: 10s
 
-  # DB service metrics (if they expose /metrics endpoint)
+  # DB service metrics (if they expose /api/v1/metrics endpoint)
   - job_name: penpal-db-service
     static_configs:
       - targets: ["db-service:3001"]
-    metrics_path: /metrics
+    metrics_path: /api/v1/metrics
     scrape_interval: 30s
     scrape_timeout: 10s
 
-  # AI service metrics (if they expose /metrics endpoint)
+  # AI service metrics (if they expose /api/v1/metrics endpoint)
   - job_name: penpal-ai-service
     static_configs:
       - targets: ["ai-service:3003"]
-    metrics_path: /metrics
+    metrics_path: /api/v1/metrics
     scrape_interval: 30s
     scrape_timeout: 10s
 
-  # Payment service metrics (if they expose /metrics endpoint)
+  # Payment service metrics (if they expose /api/v1/metrics endpoint)
   - job_name: penpal-payment-service
     static_configs:
       - targets: ["payment-service:3004"]
-    metrics_path: /metrics
+    metrics_path: /api/v1/metrics
     scrape_interval: 30s
     scrape_timeout: 10s
 

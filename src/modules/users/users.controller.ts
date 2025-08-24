@@ -80,6 +80,41 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Get("metrics")
+  @ApiOperation({ summary: "Get user metrics for monitoring" })
+  @ApiResponse({
+    status: 200,
+    description: "User metrics retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        activeUsers: { type: "number" },
+        totalUsers: { type: "number" },
+        usersByLanguage: {
+          type: "object",
+          additionalProperties: { type: "number" },
+        },
+        averageUserLevel: {
+          type: "object",
+          additionalProperties: { type: "number" },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error while calculating metrics",
+  })
+  async getUserMetrics(): Promise<{
+    activeUsers: number;
+    totalUsers: number;
+    usersByLanguage: Record<string, number>;
+    averageUserLevel: Record<string, number>;
+  }> {
+    this.logger.log("Getting user metrics for monitoring");
+    return this.usersService.getUserMetrics();
+  }
+
   @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheKey("all_users")
